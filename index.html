@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khulna Gazette News Photo Card Generator</title>
+  <!-- SEO & Meta Tags -->
+  <meta name="description" content="খুলনা গেজেট এর জন্য প্রফেশনাল নিউজ ফটো কার্ড তৈরি করার অনলাইন টুল। ডেট কনভার্টার, ইমেজ ক্রপ, ও ইনস্ট্যান্ট ডাউনলোড সহ।">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container hidden">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <img src="assets/logo.png" alt="Khulna Gazette Logo" class="brand-logo-img">
+        <span class="logo-sub">কার্ড জেনারেটর</span>
+      </div>
+      <div class="header-actions" style="display: flex; gap: 8px;">
+        <button id="logoutBtn" class="action-icon-btn" title="লগআউট">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+        <button id="themeToggleBtn" class="action-icon-btn" title="থিম পরিবর্তন">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-content">
+      <!-- Left Panel: Controls -->
+      <section class="control-panel scrollable">
+        <div class="panel-section">
+          <h2 class="section-title"><span class="section-num">১</span> তারিখ ও সময়</h2>
+          
+          <div class="form-group inline-group">
+            <div class="input-wrap">
+              <label for="newsDateInput">তারিখ সিলেক্ট করুন</label>
+              <input type="date" id="newsDateInput">
+            </div>
+            <div class="checkbox-wrap">
+              <input type="checkbox" id="autoBengaliDate" checked>
+              <label for="autoBengaliDate">অটো বাংলা কনভার্ট</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customDateText">তারিখের কাস্টম টেক্সট (ঐচ্ছিক)</label>
+            <input type="text" id="customDateText" placeholder="যেমন: ২৪ জুন ২০২৬">
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2 class="section-title"><span class="section-num">২</span> সংবাদের ছবি</h2>
+          
+          <div class="form-group">
+            <label>ছবি আপলোড করুন</label>
+            <div class="upload-dropzone" id="imageDropzone">
+              <input type="file" id="newsImageFile" accept="image/*" class="file-input">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="upload-icon"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <p class="upload-text">ক্লিক করুন অথবা ছবি এখানে ড্রপ করুন</p>
+              <span class="upload-hint">PNG, JPG, WEBP (সর্বোচ্চ ১০ এমবি)</span>
+            </div>
+          </div>
+
+          <!-- Position Adjustments -->
+          <div class="image-adjustments disabled" id="imageAdjustmentsArea">
+            <label class="adjustments-label">ছবি এডজাস্টমেন্ট</label>
+            
+            <div class="form-group range-group">
+              <div class="range-header">
+                <span>জুম (Zoom)</span>
+                <span id="zoomValDisplay">100%</span>
+              </div>
+              <input type="range" id="imageZoom" min="10" max="300" value="100">
+            </div>
+
+            <div class="adjustment-grids">
+              <div class="form-group range-group">
+                <div class="range-header">
+                  <span>Horizontal (X)</span>
+                  <span id="panXDisplay">0px</span>
+                </div>
+                <input type="range" id="imagePanX" min="-500" max="500" value="0">
+              </div>
+
+              <div class="form-group range-group">
+                <div class="range-header">
+                  <span>Vertical (Y)</span>
+                  <span id="panYDisplay">0px</span>
+                </div>
+                <input type="range" id="imagePanY" min="-500" max="500" value="0">
+              </div>
+            </div>
+
+            <div class="adjustments-actions">
+              <button id="resetImageAdjustBtn" class="secondary-btn btn-sm">রিসেট পজিশন</button>
+              <button id="fitImageBtn" class="secondary-btn btn-sm">ফিট করুন</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2 class="section-title"><span class="section-num">৩</span> শিরোনাম ও বিবরণ</h2>
+          
+          <div class="form-group">
+            <label for="subHeadlineInput">উপ-শিরোনাম (Sub Headline)</label>
+            <input type="text" id="subHeadlineInput" placeholder="এখানে উপ-শিরোনাম লিখুন (ঐচ্ছিক)">
+          </div>
+
+          <div class="form-group range-group">
+            <div class="range-header">
+              <span>উপ-শিরোনাম ফন্ট সাইজ (Sub Font Size)</span>
+              <span id="subFontSizeDisplay">২৪px</span>
+            </div>
+            <input type="range" id="subHeadlineFontSize" min="16" max="50" value="24">
+          </div>
+
+          <div class="form-group">
+            <label for="headlineInput">মূল শিরোনাম (Headline)</label>
+            <textarea id="headlineInput" rows="3" placeholder="এখানে সংবাদের মূল শিরোনাম লিখুন..."></textarea>
+            <div class="char-counter"><span id="charCount">০</span> অক্ষর</div>
+          </div>
+
+          <div class="form-group range-group">
+            <div class="range-header">
+              <span>ফন্ট সাইজ (Font Size)</span>
+              <span id="fontSizeDisplay">৩৮px</span>
+            </div>
+            <input type="range" id="headlineFontSize" min="24" max="80" value="38">
+          </div>
+
+          <div class="color-pickers-group">
+            <div class="form-group color-input-wrap">
+              <label>উপ-শিরোনামের রং</label>
+              <div class="color-presets" id="subColorPresets">
+                <span class="color-dot active" data-color="#f8fafc" style="background-color: #f8fafc;"></span>
+                <span class="color-dot" data-color="#facc15" style="background-color: #facc15;"></span>
+                <span class="color-dot" data-color="#38bdf8" style="background-color: #38bdf8;"></span>
+                <span class="color-dot" data-color="#f87171" style="background-color: #f87171;"></span>
+                <div class="custom-color-picker">
+                  <input type="color" id="subHeadlineColor" value="#f8fafc">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group color-input-wrap">
+              <label>মূল শিরোনামের রং</label>
+              <div class="color-presets" id="headColorPresets">
+                <span class="color-dot active" data-color="#ffffff" style="background-color: #ffffff;"></span>
+                <span class="color-dot" data-color="#facc15" style="background-color: #facc15;"></span>
+                <span class="color-dot" data-color="#fb923c" style="background-color: #fb923c;"></span>
+                <span class="color-dot" data-color="#f87171" style="background-color: #f87171;"></span>
+                <div class="custom-color-picker">
+                  <input type="color" id="headlineColor" value="#ffffff">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <h2 class="section-title"><span class="section-num">৪</span> ওয়েবসাইট ও বিজ্ঞাপন</h2>
+          
+          <div class="form-group">
+            <label for="webUrlInput">ওয়েবসাইট এড্রেস</label>
+            <input type="text" id="webUrlInput" value="www.khulnagazette.com/www.khulnagazette.net">
+          </div>
+
+          <div class="form-group range-group">
+            <div class="range-header">
+              <span>ইউআরএল ফন্ট সাইজ (URL Font Size)</span>
+              <span id="urlFontSizeDisplay">২২px</span>
+            </div>
+            <input type="range" id="urlFontSize" min="14" max="36" value="22">
+          </div>
+
+          <div class="form-group">
+            <label>বিজ্ঞাপন নির্বাচন করুন</label>
+            <div class="ad-selector-grid">
+              <div class="ad-preset-option active" data-ad-type="preset" data-ad-path="assets/ad_road_home.png">
+                <img src="assets/ad_road_home.png" alt="Road Home Ad">
+                <span class="preset-label">Road Home</span>
+              </div>
+              <div class="ad-preset-option" data-ad-type="preset" data-ad-path="assets/ad_aci_water_pump.png">
+                <img src="assets/ad_aci_water_pump.png" alt="ACI Water Pump Ad">
+                <span class="preset-label">ACI Water Pump</span>
+              </div>
+              <div class="ad-preset-option" data-ad-type="preset" data-ad-path="assets/ad_aci_smart_tools.png">
+                <img src="assets/ad_aci_smart_tools.png" alt="ACI Smart Tools Ad">
+                <span class="preset-label">ACI Smart Tools</span>
+              </div>
+              <div class="ad-preset-option" id="customAdOption" data-ad-type="custom">
+                <div class="custom-ad-placeholder">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>কাস্টম ব্যানার</span>
+                </div>
+                <input type="file" id="customAdFile" accept="image/*" class="file-input-hidden">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-section">
+          <button id="downloadPngBtn" class="primary-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="btn-icon"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>কার্ড ডাউনলোড করুন (PNG)</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Right Panel: Canvas & Preview -->
+      <section class="preview-panel">
+        <div class="preview-container">
+          <div class="preview-header">
+            <h3>লাইভ প্রিভিউ (Live Preview)</h3>
+            <span class="badge-status">Pixel-Perfect Canvas</span>
+          </div>
+          
+          <div class="canvas-wrapper">
+            <!-- The actual interactive canvas representing the 1000x1200 card -->
+            <canvas id="cardCanvas" width="1000" height="1200"></canvas>
+          </div>
+          
+          <div class="preview-helper-text">
+            * কার্ডটি সামাজিক যোগাযোগ মাধ্যমে ডাউনলোডের জন্য উচ্চ রেজোলিউশনে রেন্ডার হচ্ছে।
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Login Overlay -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+      <div class="login-header">
+        <img src="assets/logo.png" alt="Khulna Gazette Logo" class="login-logo-img">
+        <h2>কার্ড জেনারেটর লগইন</h2>
+        <p>অনুগ্রহ করে আপনার ইমেইল এবং পাসওয়ার্ড দিয়ে প্রবেশ করুন।</p>
+      </div>
+      <form id="loginForm" class="login-form">
+        <div class="login-form-group">
+          <label for="loginEmail">ইমেইল ঠিকানা</label>
+          <input type="email" id="loginEmail" placeholder="যেমন: admin@khulnagazette.com" required>
+        </div>
+        <div class="login-form-group">
+          <label for="loginPassword">পাসওয়ার্ড</label>
+          <input type="password" id="loginPassword" placeholder="আপনার পাসওয়ার্ড লিখুন" required>
+        </div>
+        <div id="loginErrorMsg" class="login-error-msg">ইমেইল অথবা পাসওয়ার্ডটি সঠিক নয়!</div>
+        <button type="submit" class="login-btn">লগইন করুন</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
