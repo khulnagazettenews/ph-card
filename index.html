@@ -10,7 +10,11 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;900&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wght@100..800&family=Atma:wght@300..700&family=Baloo+Da+2:wght@400..800&family=Galada&family=Hind+Siliguri:wght@300..700&family=Mina:wght@400;700&family=Noto+Sans+Bengali:wght@100..900&family=Noto+Serif+Bengali:wght@100..900&family=Outfit:wght@300..700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
+  <!-- Bangla Fonts CDN -->
+  <link href="https://fonts.maateen.me/solaiman-lipi/font.css" rel="stylesheet">
+  <link href="https://fonts.maateen.me/siyam-rupali/font.css" rel="stylesheet">
+  <link href="https://fonts.maateen.me/adorsho-lipi/font.css" rel="stylesheet">
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css">
 </head>
@@ -52,6 +56,25 @@
           <div class="form-group">
             <label for="customDateText">তারিখের কাস্টম টেক্সট (ঐচ্ছিক)</label>
             <input type="text" id="customDateText" placeholder="যেমন: ২৪ জুন ২০২৬">
+          </div>
+
+          <div class="form-group">
+            <label for="dateFontFamily">তারিখের ফন্ট (Date Font)</label>
+            <select id="dateFontFamily" class="font-select">
+              <option value="Noto Serif Bengali" selected>Noto Serif Bengali (নিউজ হেডলাইন - ডিফল্ট)</option>
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া নিউজ)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+            </select>
           </div>
         </div>
 
@@ -122,6 +145,25 @@
           </div>
 
           <div class="form-group">
+            <label for="subHeadlineFontFamily">উপ-শিরোনাম ফন্ট (Sub Font)</label>
+            <select id="subHeadlineFontFamily" class="font-select">
+              <option value="Hind Siliguri" selected>Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label for="headlineInput">মূল শিরোনাম (Headline)</label>
             <textarea id="headlineInput" rows="3" placeholder="এখানে সংবাদের মূল শিরোনাম লিখুন..."></textarea>
             <div class="char-counter"><span id="charCount">০</span> অক্ষর</div>
@@ -133,6 +175,25 @@
               <span id="fontSizeDisplay">৩৮px</span>
             </div>
             <input type="range" id="headlineFontSize" min="24" max="80" value="38">
+          </div>
+
+          <div class="form-group">
+            <label for="headlineFontFamily">মূল শিরোনাম ফন্ট (Headline Font)</label>
+            <select id="headlineFontFamily" class="font-select">
+              <option value="Hind Siliguri" selected>Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+            </select>
           </div>
 
           <div class="color-pickers-group">
@@ -169,7 +230,7 @@
         <div class="panel-section">
           <h2 class="section-title"><span class="section-num">৪</span> ওয়েবসাইট ও বিজ্ঞাপন</h2>
           
-          <div class="form-group">
+          <div class="form-group text-group">
             <label for="webUrlInput">ওয়েবসাইট এড্রেস</label>
             <input type="text" id="webUrlInput" value="www.khulnagazette.com/www.khulnagazette.net">
           </div>
@@ -180,6 +241,25 @@
               <span id="urlFontSizeDisplay">২২px</span>
             </div>
             <input type="range" id="urlFontSize" min="14" max="36" value="22">
+          </div>
+
+          <div class="form-group">
+            <label for="urlFontFamily">ইউআরএল ফন্ট (URL Font)</label>
+            <select id="urlFontFamily" class="font-select">
+              <option value="Hind Siliguri" selected>Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+            </select>
           </div>
 
           <div class="form-group">

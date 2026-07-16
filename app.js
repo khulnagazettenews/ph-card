@@ -42,6 +42,10 @@ const state = {
   fontSize: 38,
   urlFontSize: 22,
   webUrl: 'www.khulnagazette.com/www.khulnagazette.net',
+  dateFont: 'Noto Serif Bengali',
+  subHeadlineFont: 'Hind Siliguri',
+  headlineFont: 'Hind Siliguri',
+  urlFont: 'Hind Siliguri',
   isDragging: false,
   dragStart: { x: 0, y: 0 }
 };
@@ -78,6 +82,11 @@ const headlineColor = document.getElementById('headlineColor');
 const webUrlInput = document.getElementById('webUrlInput');
 const urlFontSize = document.getElementById('urlFontSize');
 const urlFontSizeDisplay = document.getElementById('urlFontSizeDisplay');
+
+const dateFontFamily = document.getElementById('dateFontFamily');
+const subHeadlineFontFamily = document.getElementById('subHeadlineFontFamily');
+const headlineFontFamily = document.getElementById('headlineFontFamily');
+const urlFontFamily = document.getElementById('urlFontFamily');
 
 const downloadPngBtn = document.getElementById('downloadPngBtn');
 const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -169,7 +178,7 @@ function drawCard() {
 
   // 3. Draw Date (Right side)
   ctx.fillStyle = '#111111';
-  ctx.font = '700 34px "Noto Serif Bengali", "Vrinda", "SolaimanLipi", "Kalpurush", serif';
+  ctx.font = `700 34px "${state.dateFont}", "Vrinda", "SolaimanLipi", "Kalpurush", serif`;
   ctx.textAlign = 'right';
   ctx.fillText(state.dateText, 950, 90);
 
@@ -205,7 +214,7 @@ function drawCard() {
 
     // Text details
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '600 24px "Hind Siliguri", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif';
+    ctx.font = `600 24px "${state.subHeadlineFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
     ctx.textAlign = 'center';
     ctx.fillText('সংবাদের মূল ছবি এখানে দেখতে পাবেন', px + pw / 2, py + ph / 2);
   }
@@ -231,13 +240,15 @@ function drawCard() {
   // Wrap Sub-Headline if present
   let subLines = [];
   const subLineHeight = state.subFontSize * 1.45;
+  const subFontString = `600 ${state.subFontSize}px "${state.subHeadlineFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
   if (state.subHeadline && state.subHeadline.trim() !== '') {
-    subLines = wrapText(state.subHeadline, maxWidth, `600 ${state.subFontSize}px "Hind Siliguri", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`, ctx);
+    subLines = wrapText(state.subHeadline, maxWidth, subFontString, ctx);
   }
   
   // Wrap Headline
   const lineHeight = state.fontSize * 1.45;
-  const lines = wrapText(state.headline, maxWidth, `700 ${state.fontSize}px "Hind Siliguri", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`, ctx);
+  const headlineFontString = `700 ${state.fontSize}px "${state.headlineFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
+  const lines = wrapText(state.headline, maxWidth, headlineFontString, ctx);
   
   // Calculate total height of the text block
   const gap = 35;
@@ -250,7 +261,7 @@ function drawCard() {
   if (subLines.length > 0) {
     ctx.fillStyle = state.subHeadlineColor;
     ctx.textAlign = 'center';
-    ctx.font = `600 ${state.subFontSize}px "Hind Siliguri", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
+    ctx.font = subFontString;
     for (let i = 0; i < subLines.length; i++) {
       ctx.fillText(subLines[i], textX, currentY);
       currentY += subLineHeight;
@@ -261,7 +272,7 @@ function drawCard() {
   // Draw Headline
   ctx.fillStyle = state.headlineColor;
   ctx.textAlign = 'center';
-  ctx.font = `700 ${state.fontSize}px "Hind Siliguri", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
+  ctx.font = headlineFontString;
   for (let i = 0; i < lines.length; i++) {
     ctx.fillText(lines[i], textX, currentY);
     currentY += lineHeight;
@@ -283,7 +294,7 @@ function drawCard() {
 
   // 9. Draw Web URL
   ctx.fillStyle = '#ffffff';
-  ctx.font = `700 ${state.urlFontSize}px "Hind Siliguri", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
+  ctx.font = `700 ${state.urlFontSize}px "${state.urlFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
   ctx.textAlign = 'center';
   ctx.fillText(state.webUrl, canvas.width / 2, 1025);
 
@@ -492,6 +503,40 @@ urlFontSize.addEventListener('input', (e) => {
   state.urlFontSize = parseInt(e.target.value);
   urlFontSizeDisplay.textContent = `${state.urlFontSize}px`;
   drawCard();
+});
+
+// Function to dynamically load and redraw
+function loadFontAndRedraw(fontFamily, weight = '400') {
+  if (document.fonts) {
+    // Attempt to load the font family before drawing
+    document.fonts.load(`${weight} 16px "${fontFamily}"`).then(() => {
+      drawCard();
+    }).catch(() => {
+      drawCard(); // Fallback if loading fails
+    });
+  } else {
+    drawCard();
+  }
+}
+
+dateFontFamily.addEventListener('change', (e) => {
+  state.dateFont = e.target.value;
+  loadFontAndRedraw(state.dateFont, '700');
+});
+
+subHeadlineFontFamily.addEventListener('change', (e) => {
+  state.subHeadlineFont = e.target.value;
+  loadFontAndRedraw(state.subHeadlineFont, '600');
+});
+
+headlineFontFamily.addEventListener('change', (e) => {
+  state.headlineFont = e.target.value;
+  loadFontAndRedraw(state.headlineFont, '700');
+});
+
+urlFontFamily.addEventListener('change', (e) => {
+  state.urlFont = e.target.value;
+  loadFontAndRedraw(state.urlFont, '700');
 });
 
 // Event Bindings: Preset & Custom Ads
