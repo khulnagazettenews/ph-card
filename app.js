@@ -22,6 +22,31 @@ function formatDateToBengali(dateObj) {
   return `${day} ${month} ${year}`;
 }
 
+const UNICODE_DEFAULT_HEADLINE = 'জুলাই গণহত্যার বিচার করতে সরকার প্রতিশ্রুতিবদ্ধ: রিজভী';
+const ANSI_DEFAULT_HEADLINE = 'RjvB MYnZ¨vi wePvi Ki‡Z miKvi cÖwZkÖæZŸ×: wiRfx';
+
+function isAnsiFont(fontName) {
+  return fontName === 'SutonnyMJ' || fontName === 'SutonnyOMJ';
+}
+
+function updateHeadlineForFont(newFont) {
+  const currentVal = headlineInput.value.trim();
+  
+  if (isAnsiFont(newFont)) {
+    if (currentVal === UNICODE_DEFAULT_HEADLINE) {
+      state.headline = ANSI_DEFAULT_HEADLINE;
+      headlineInput.value = ANSI_DEFAULT_HEADLINE;
+      charCountDisplay.textContent = translateToBengaliDigits(ANSI_DEFAULT_HEADLINE.length);
+    }
+  } else {
+    if (currentVal === ANSI_DEFAULT_HEADLINE) {
+      state.headline = UNICODE_DEFAULT_HEADLINE;
+      headlineInput.value = UNICODE_DEFAULT_HEADLINE;
+      charCountDisplay.textContent = translateToBengaliDigits(UNICODE_DEFAULT_HEADLINE.length);
+    }
+  }
+}
+
 // Application State
 const state = {
   logoImg: null,
@@ -38,13 +63,13 @@ const state = {
   subFontSize: 24,
   subHeadlineColor: '#f8fafc',
   headlineColor: '#ffffff',
-  headline: 'জুলাই গণহত্যার বিচার করতে সরকার প্রতিশ্রুতিবদ্ধ: রিজভী',
-  fontSize: 38,
+  headline: 'RjvB MYnZ¨vi wePvi Ki‡Z miKvi cÖwZkÖæZŸ×: wiRfx',
+  fontSize: 50,
   urlFontSize: 22,
   webUrl: 'www.khulnagazette.com/www.khulnagazette.net',
   dateFont: 'Noto Serif Bengali',
-  subHeadlineFont: 'Hind Siliguri',
-  headlineFont: 'Hind Siliguri',
+  subHeadlineFont: 'SutonnyMJ',
+  headlineFont: 'SutonnyMJ',
   urlFont: 'Hind Siliguri',
   isDragging: false,
   dragStart: { x: 0, y: 0 }
@@ -98,6 +123,11 @@ state.dateText = formatDateToBengali(currentDate);
 customDateText.value = state.dateText;
 headlineInput.value = state.headline;
 charCountDisplay.textContent = translateToBengaliDigits(state.headline.length);
+
+// Sync input element font families with state defaults
+headlineInput.style.fontFamily = `"${state.headlineFont}", var(--font-bangla)`;
+subHeadlineInput.style.fontFamily = `"${state.subHeadlineFont}", var(--font-bangla)`;
+customDateText.style.fontFamily = `"${state.dateFont}", var(--font-bangla)`;
 
 // Load Assets
 const assets = {
@@ -507,35 +537,55 @@ urlFontSize.addEventListener('input', (e) => {
 
 // Function to dynamically load and redraw
 function loadFontAndRedraw(fontFamily, weight = '400') {
+  // 1. Draw immediately using standard/system fallback fonts
+  drawCard();
+
   if (document.fonts) {
-    // Attempt to load the font family before drawing
-    document.fonts.load(`${weight} 16px "${fontFamily}"`).then(() => {
-      drawCard();
-    }).catch(() => {
-      drawCard(); // Fallback if loading fails
-    });
+    // 2. Try loading the font using Web Fonts API
+    const fontSpec = `${weight} 16px "${fontFamily}"`;
+    document.fonts.load(fontSpec)
+      .then(() => {
+        drawCard();
+      })
+      .catch((err) => {
+        console.warn("Font loading error for specs:", fontSpec, err);
+        drawCard();
+      });
+
+    // 3. Robust redraw intervals as font files stream from CDNs
+    setTimeout(drawCard, 50);
+    setTimeout(drawCard, 150);
+    setTimeout(drawCard, 350);
+    setTimeout(drawCard, 700);
+    setTimeout(drawCard, 1500);
   } else {
-    drawCard();
+    setTimeout(drawCard, 100);
+    setTimeout(drawCard, 400);
   }
 }
 
 dateFontFamily.addEventListener('change', (e) => {
   state.dateFont = e.target.value;
+  customDateText.style.fontFamily = `"${state.dateFont}", var(--font-bangla)`;
   loadFontAndRedraw(state.dateFont, '700');
 });
 
 subHeadlineFontFamily.addEventListener('change', (e) => {
   state.subHeadlineFont = e.target.value;
+  subHeadlineInput.style.fontFamily = `"${state.subHeadlineFont}", var(--font-bangla)`;
   loadFontAndRedraw(state.subHeadlineFont, '600');
 });
 
 headlineFontFamily.addEventListener('change', (e) => {
   state.headlineFont = e.target.value;
+  headlineInput.style.fontFamily = `"${state.headlineFont}", var(--font-bangla)`;
+  updateHeadlineForFont(state.headlineFont);
   loadFontAndRedraw(state.headlineFont, '700');
 });
 
 urlFontFamily.addEventListener('change', (e) => {
   state.urlFont = e.target.value;
+  webUrlInput.style.fontFamily = `"${state.urlFont}", var(--font-bangla)`;
   loadFontAndRedraw(state.urlFont, '700');
 });
 

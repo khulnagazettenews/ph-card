@@ -16,7 +16,7 @@
   <link href="https://fonts.maateen.me/siyam-rupali/font.css" rel="stylesheet">
   <link href="https://fonts.maateen.me/adorsho-lipi/font.css" rel="stylesheet">
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <div class="app-container hidden">
@@ -73,7 +73,9 @@
               <option value="Mina">Mina</option>
               <option value="Galada">Galada</option>
               <option value="Atma">Atma</option>
-              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
             </select>
           </div>
         </div>
@@ -147,7 +149,7 @@
           <div class="form-group">
             <label for="subHeadlineFontFamily">উপ-শিরোনাম ফন্ট (Sub Font)</label>
             <select id="subHeadlineFontFamily" class="font-select">
-              <option value="Hind Siliguri" selected>Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
               <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
               <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
               <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
@@ -159,7 +161,9 @@
               <option value="Mina">Mina</option>
               <option value="Galada">Galada</option>
               <option value="Atma">Atma</option>
-              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+              <option value="SutonnyMJ" selected>SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
             </select>
           </div>
 
@@ -172,15 +176,15 @@
           <div class="form-group range-group">
             <div class="range-header">
               <span>ফন্ট সাইজ (Font Size)</span>
-              <span id="fontSizeDisplay">৩৮px</span>
+              <span id="fontSizeDisplay">৫০px</span>
             </div>
-            <input type="range" id="headlineFontSize" min="24" max="80" value="38">
+            <input type="range" id="headlineFontSize" min="24" max="80" value="50">
           </div>
 
           <div class="form-group">
             <label for="headlineFontFamily">মূল শিরোনাম ফন্ট (Headline Font)</label>
             <select id="headlineFontFamily" class="font-select">
-              <option value="Hind Siliguri" selected>Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
               <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
               <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
               <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
@@ -192,7 +196,9 @@
               <option value="Mina">Mina</option>
               <option value="Galada">Galada</option>
               <option value="Atma">Atma</option>
-              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+              <option value="SutonnyMJ" selected>SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
             </select>
           </div>
 
@@ -258,7 +264,8 @@
               <option value="Mina">Mina</option>
               <option value="Galada">Galada</option>
               <option value="Atma">Atma</option>
-              <option value="Kalpurush">Kalpurush (সিস্টেম)</option>
+              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
             </select>
           </div>
 
@@ -340,6 +347,28 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <!-- Preload fonts by rendering hidden elements -->
+  <div style="position: absolute; visibility: hidden; height: 0; width: 0; overflow: hidden; pointer-events: none;">
+    <span style="font-family: 'Noto Serif Bengali'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Hind Siliguri'; font-weight: 600;">preload</span>
+    <span style="font-family: 'Hind Siliguri'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Siyam Rupali'; font-weight: 600;">preload</span>
+    <span style="font-family: 'Siyam Rupali'; font-weight: 700;">preload</span>
+    <span style="font-family: 'SolaimanLipi'; font-weight: 400;">preload</span>
+    <span style="font-family: 'SolaimanLipi'; font-weight: 700;">preload</span>
+    <span style="font-family: 'AdorshoLipi'; font-weight: 600;">preload</span>
+    <span style="font-family: 'AdorshoLipi'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Noto Sans Bengali'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Anek Bangla'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Tiro Bangla'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Baloo Da 2'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Mina'; font-weight: 700;">preload</span>
+    <span style="font-family: 'Galada'; font-weight: 400;">preload</span>
+    <span style="font-family: 'Atma'; font-weight: 700;">preload</span>
+    <span style="font-family: 'SutonnyMJ'; font-weight: 700;">preload</span>
+    <span style="font-family: 'SutonnyOMJ'; font-weight: 700;">preload</span>
+  </div>
+
+  <script src="app.js?v=2"></script>
 </body>
 </html>

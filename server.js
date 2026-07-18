@@ -10,16 +10,21 @@ const MIME_TYPES = {
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
-  '.webp': 'image/webp'
+  '.webp': 'image/webp',
+  '.ttf': 'font/ttf',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2'
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+  const cleanUrl = req.url.split('?')[0];
+  let filePath = path.join(__dirname, cleanUrl === '/' ? 'index.html' : cleanUrl);
   const ext = path.extname(filePath);
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
   fs.readFile(filePath, (err, content) => {
     if (err) {
+      console.log(`[404] ${req.method} ${req.url} -> File not found: ${filePath}`);
       if (err.code === 'ENOENT') {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('404 Not Found');
@@ -28,6 +33,7 @@ const server = http.createServer((req, res) => {
         res.end(`Server Error: ${err.code}`);
       }
     } else {
+      console.log(`[200] ${req.method} ${req.url}`);
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(content, 'utf-8');
     }
