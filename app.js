@@ -25,6 +25,8 @@ function formatDateToBengali(dateObj) {
 const UNICODE_DEFAULT_HEADLINE = 'জুলাই গণহত্যার বিচার করতে সরকার প্রতিশ্রুতিবদ্ধ: রিজভী';
 const ANSI_DEFAULT_HEADLINE = 'RjvB MYnZ¨vi wePvi Ki‡Z miKvi cÖwZkÖæZŸ×: wiRfx';
 
+const BANGLA_FONT_FALLBACKS = ', "Noto Serif Bengali", "Hind Siliguri", "SolaimanLipi", "Siyam Rupali", "Kalpurush", "AdorshoLipi", "Anek Bangla", "Tiro Bangla", "Baloo Da 2", "Mina", "Galada", "Atma", "Nirmala UI", "Vrinda", "Shonar Bangla", "Bangla Sangam MN", "Kohinoor Bangla", "Bangla MN", sans-serif';
+
 function isAnsiFont(fontName) {
   return fontName === 'SutonnyMJ' || fontName === 'SutonnyOMJ';
 }
@@ -60,7 +62,7 @@ const state = {
   },
   dateText: '',
   subHeadline: '',
-  subFontSize: 24,
+  subFontSize: 30,
   subHeadlineColor: '#f8fafc',
   headlineColor: '#ffffff',
   headline: 'RjvB MYnZ¨vi wePvi Ki‡Z miKvi cÖwZkÖæZŸ×: wiRfx',
@@ -166,21 +168,26 @@ Promise.all([
 
 function wrapText(text, maxWidth, font, context) {
   context.font = font;
-  const words = text.split(' ');
-  let line = '';
+  const paragraphs = text.split('\n');
   const lines = [];
-  for (let n = 0; n < words.length; n++) {
-    let testLine = line + words[n] + ' ';
-    let metrics = context.measureText(testLine);
-    let testWidth = metrics.width;
-    if (testWidth > maxWidth && n > 0) {
-      lines.push(line.trim());
-      line = words[n] + ' ';
-    } else {
-      line = testLine;
+  
+  for (let p = 0; p < paragraphs.length; p++) {
+    const words = paragraphs[p].split(' ');
+    let line = '';
+    
+    for (let n = 0; n < words.length; n++) {
+      let testLine = line + words[n] + ' ';
+      let metrics = context.measureText(testLine);
+      let testWidth = metrics.width;
+      if (testWidth > maxWidth && n > 0) {
+        lines.push(line.trim());
+        line = words[n] + ' ';
+      } else {
+        line = testLine;
+      }
     }
+    lines.push(line.trim());
   }
-  lines.push(line.trim());
   return lines;
 }
 
@@ -208,7 +215,7 @@ function drawCard() {
 
   // 3. Draw Date (Right side)
   ctx.fillStyle = '#111111';
-  ctx.font = `700 34px "${state.dateFont}", "Vrinda", "SolaimanLipi", "Kalpurush", serif`;
+  ctx.font = `700 34px "${state.dateFont}"${BANGLA_FONT_FALLBACKS}`;
   ctx.textAlign = 'right';
   ctx.fillText(state.dateText, 950, 90);
 
@@ -263,50 +270,103 @@ function drawCard() {
   ctx.strokeStyle = '#ffffff';
   ctx.stroke();
 
-  // 7. Draw Sub-Headline and Headline (Centered text wrapping)
+  // 7. Draw Sub-Headline and Headline (Smart Adaptive Centering & Spacing)
   const textX = canvas.width / 2;
   const maxWidth = 900;
+  const maxAvailableHeight = 260; // Available height between image (690px) and divider (970px)
   
-  // Wrap Sub-Headline if present
+  let effectiveSubFontSize = state.subFontSize;
+  let effectiveFontSize = state.fontSize;
+  
   let subLines = [];
-  const subLineHeight = state.subFontSize * 1.45;
-  const subFontString = `600 ${state.subFontSize}px "${state.subHeadlineFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
-  if (state.subHeadline && state.subHeadline.trim() !== '') {
-    subLines = wrapText(state.subHeadline, maxWidth, subFontString, ctx);
+  let lines = [];
+  let subLineHeight = 0;
+  let headlineLineHeight = 0;
+  let gap = 0;
+  let subBlockHeight = 0;
+  let headBlockHeight = 0;
+  let totalHeight = 0;
+  
+  // Calculate text wrapping and total height with optional auto-fit scaling
+  for (let attempt = 0; attempt < 2; attempt++) {
+    subLineHeight = Math.round(effectiveSubFontSize * 1.35);
+    headlineLineHeight = Math.round(effectiveFontSize * 1.38);
+    
+    const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+    const headlineFontString = `700 ${effectiveFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
+    
+    if (state.subHeadline && state.subHeadline.trim() !== '') {
+      subLines = wrapText(state.subHeadline, maxWidth, subFontString, ctx);
+    } else {
+      subLines = [];
+    }
+    
+    lines = wrapText(state.headline, maxWidth, headlineFontString, ctx);
+    
+    gap = subLines.length > 0 ? Math.round(Math.min(26, Math.max(14, effectiveSubFontSize * 0.45))) : 0;
+    subBlockHeight = subLines.length > 0 ? (subLines.length - 1) * subLineHeight + (effectiveSubFontSize * 1.0) : 0;
+    headBlockHeight = lines.length > 0 ? (lines.length - 1) * headlineLineHeight + (effectiveFontSize * 1.0) : 0;
+    totalHeight = subBlockHeight + gap + headBlockHeight;
+    
+    // Auto-fit scale down only if total height exceeds available vertical area (260px)
+    if (attempt === 0 && totalHeight > maxAvailableHeight) {
+      const scaleFactor = Math.max(0.80, maxAvailableHeight / totalHeight);
+      effectiveSubFontSize = Math.max(16, Math.round(state.subFontSize * scaleFactor));
+      effectiveFontSize = Math.max(22, Math.round(state.fontSize * scaleFactor));
+    } else {
+      break;
+    }
   }
   
-  // Wrap Headline
-  const lineHeight = state.fontSize * 1.45;
-  const headlineFontString = `700 ${state.fontSize}px "${state.headlineFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
-  const lines = wrapText(state.headline, maxWidth, headlineFontString, ctx);
+  // Vertical bounds and centering (3 suta = 36px gap below 690px news image border)
+  const minTopY = subLines.length > 0 ? 726 : 708; // 3 suta (36px) below image when subheadline is present
+  const maxBottomY = 960; // Clear gap above divider line
+  const centerSpaceY = 834; // Midpoint of Y=726 to Y=960
   
-  // Calculate total height of the text block
-  const gap = 35;
-  const totalHeight = (subLines.length > 0 ? (subLines.length * subLineHeight) + gap : 0) + (lines.length * lineHeight);
+  let topY = centerSpaceY - (totalHeight / 2);
+  topY = Math.max(minTopY, Math.min(topY, maxBottomY - totalHeight));
   
-  const centerY = 835; // Center of the space between image and divider
-  let currentY = centerY - (totalHeight / 2) + (subLines.length > 0 ? subLineHeight * 0.85 : lineHeight * 0.85);
+  // Apply text shadow for enhanced legibility
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+  ctx.shadowBlur = 3;
+  ctx.shadowOffsetY = 2;
   
   // Draw Sub-Headline
   if (subLines.length > 0) {
+    const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
     ctx.fillStyle = state.subHeadlineColor;
     ctx.textAlign = 'center';
     ctx.font = subFontString;
+    
+    let currentY = topY + (effectiveSubFontSize * 0.82);
     for (let i = 0; i < subLines.length; i++) {
       ctx.fillText(subLines[i], textX, currentY);
-      currentY += subLineHeight;
+      if (i < subLines.length - 1) {
+        currentY += subLineHeight;
+      }
     }
-    currentY += gap;
   }
   
   // Draw Headline
-  ctx.fillStyle = state.headlineColor;
-  ctx.textAlign = 'center';
-  ctx.font = headlineFontString;
-  for (let i = 0; i < lines.length; i++) {
-    ctx.fillText(lines[i], textX, currentY);
-    currentY += lineHeight;
+  if (lines.length > 0) {
+    const headlineFontString = `700 ${effectiveFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
+    ctx.fillStyle = state.headlineColor;
+    ctx.textAlign = 'center';
+    ctx.font = headlineFontString;
+    
+    let currentY = subLines.length > 0 
+      ? topY + subBlockHeight + gap + (effectiveFontSize * 0.82)
+      : topY + (effectiveFontSize * 0.82);
+      
+    for (let i = 0; i < lines.length; i++) {
+      ctx.fillText(lines[i], textX, currentY);
+      if (i < lines.length - 1) {
+        currentY += headlineLineHeight;
+      }
+    }
   }
+  ctx.restore();
 
   // 8. Draw decorative divider line (Glowing horizontal gradient line fading out at both ends)
   ctx.beginPath();
@@ -324,7 +384,7 @@ function drawCard() {
 
   // 9. Draw Web URL
   ctx.fillStyle = '#ffffff';
-  ctx.font = `700 ${state.urlFontSize}px "${state.urlFont}", "SolaimanLipi", "Kalpurush", "Vrinda", "Siyam Rupali", "Nikosh", sans-serif`;
+  ctx.font = `700 ${state.urlFontSize}px "${state.urlFont}"${BANGLA_FONT_FALLBACKS}`;
   ctx.textAlign = 'center';
   ctx.fillText(state.webUrl, canvas.width / 2, 1025);
 
@@ -543,7 +603,7 @@ function loadFontAndRedraw(fontFamily, weight = '400') {
   if (document.fonts) {
     // 2. Try loading the font using Web Fonts API
     const fontSpec = `${weight} 16px "${fontFamily}"`;
-    document.fonts.load(fontSpec)
+    document.fonts.load(fontSpec, 'খুলনা গেজেট যুক্তবর্ণ')
       .then(() => {
         drawCard();
       })

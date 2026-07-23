@@ -67,7 +67,7 @@
 /* Variables & Design System */
 :root {
   --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-bangla: 'Hind Siliguri', 'SolaimanLipi', 'Kalpurush', 'Vrinda', 'Siyam Rupali', 'Nikosh', sans-serif;
+  --font-bangla: 'Noto Serif Bengali', 'Hind Siliguri', 'SolaimanLipi', 'Siyam Rupali', 'Kalpurush', 'AdorshoLipi', 'Anek Bangla', 'Tiro Bangla', 'Baloo Da 2', 'Mina', 'Galada', 'Atma', 'Nirmala UI', 'Vrinda', 'Shonar Bangla', 'Bangla Sangam MN', 'Kohinoor Bangla', 'Bangla MN', sans-serif;
 
   /* Dark Theme Default */
   --bg-app: #0f172a;
