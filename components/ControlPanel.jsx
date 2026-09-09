@@ -102,69 +102,10 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
         </button>
       </div>
 
-      {/* 1. Date & Time */}
-      <div className="panel-section">
-        <h2 className="section-title"><span className="section-num">১</span> তারিখ ও সময়</h2>
-
-        <div className="form-group inline-group">
-          <div className="input-wrap">
-            <label htmlFor="newsDateInput">তারিখ সিলেক্ট করুন</label>
-            <input
-              type="date"
-              id="newsDateInput"
-              value={state.selectedDate}
-              onChange={(e) => updateState({ selectedDate: e.target.value })}
-            />
-          </div>
-          <div className="checkbox-wrap">
-            <input
-              type="checkbox"
-              id="autoBengaliDate"
-              checked={state.autoBengaliDate}
-              onChange={(e) => updateState({ autoBengaliDate: e.target.checked })}
-            />
-            <label htmlFor="autoBengaliDate">অটো বাংলা কনভার্ট</label>
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="customDateText">তারিখের কাস্টম টেক্সট (ঐচ্ছিক)</label>
-          <input
-            type="text"
-            id="customDateText"
-            placeholder="যেমন: ৯ সেপ্টেম্বর ২০২৬"
-            value={state.dateText}
-            onChange={(e) => updateState({ dateText: e.target.value })}
-            style={{ fontFamily: `"${state.dateFont}", var(--font-bangla)` }}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="dateFontFamily">তারিখের ফন্ট (Date Font)</label>
-          <select
-            id="dateFontFamily"
-            className="font-select"
-            value={state.dateFont}
-            onChange={(e) => updateState({ dateFont: e.target.value })}
-          >
-            <option value="Noto Serif Bengali">Noto Serif Bengali (ডিফল্ট)</option>
-            <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া)</option>
-            <option value="Siyam Rupali">Siyam Rupali (বোল্ড)</option>
-            <option value="SolaimanLipi">SolaimanLipi</option>
-            <option value="AdorshoLipi">AdorshoLipi</option>
-            <option value="Noto Sans Bengali">Noto Sans Bengali</option>
-            <option value="Anek Bangla">Anek Bangla</option>
-            <option value="Tiro Bangla">Tiro Bangla</option>
-            <option value="Baloo Da 2">Baloo Da 2</option>
-            <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
-          </select>
-        </div>
-      </div>
-
-      {/* 2. Photo Upload */}
+      {/* 1. Photo Upload */}
       <div className="panel-section">
         <h2 className="section-title">
-          <span className="section-num">২</span> {state.cardType === 'quote' ? 'ব্যক্তির ছবি' : 'সংবাদের ছবি'}
+          <span className="section-num">১</span> {state.cardType === 'quote' ? 'ব্যক্তির ছবি' : 'সংবাদের ছবি'}
         </h2>
 
         <div className="form-group">
@@ -298,10 +239,10 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
         })()}
       </div>
 
-      {/* 3. Text Fields */}
+      {/* 2. Text Fields */}
       {state.cardType === 'quote' ? (
         <div className="panel-section">
-          <h2 className="section-title"><span className="section-num">৩</span> উক্তি, নাম ও পদবি</h2>
+          <h2 className="section-title"><span className="section-num">২</span> উক্তি, নাম ও পদবি</h2>
 
           {/* Quote Text */}
           <div className="form-group">
@@ -408,7 +349,7 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
         </div>
       ) : (
         <div className="panel-section">
-          <h2 className="section-title"><span className="section-num">৩</span> শিরোনাম ও বিবরণ</h2>
+          <h2 className="section-title"><span className="section-num">২</span> শিরোনাম ও বিবরণ</h2>
 
           {/* Main Headline */}
           <div className="form-group">
@@ -570,7 +511,7 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
 
       {/* 4. Website & Ads */}
       <div className="panel-section">
-        <h2 className="section-title"><span className="section-num">৪</span> ওয়েবসাইট ও বিজ্ঞাপন</h2>
+        <h2 className="section-title"><span className="section-num">৩</span> ওয়েবসাইট ও বিজ্ঞাপন</h2>
 
         <div className="form-group text-group">
           <label htmlFor="webUrlInput">ওয়েবসাইট এড্রেস</label>
@@ -664,6 +605,65 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
               />
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Date & Time (Bottom) */}
+      <div className="panel-section">
+        <h2 className="section-title"><span className="section-num">৪</span> তারিখ ও সময়</h2>
+
+        <div className="form-group inline-group">
+          <div className="input-wrap">
+            <label htmlFor="newsDateInput">তারিখ সিলেক্ট করুন</label>
+            <input
+              type="date"
+              id="newsDateInput"
+              value={state.selectedDate}
+              onChange={(e) => updateState({ selectedDate: e.target.value })}
+            />
+          </div>
+          <div className="checkbox-wrap">
+            <input
+              type="checkbox"
+              id="autoBengaliDate"
+              checked={state.autoBengaliDate}
+              onChange={(e) => updateState({ autoBengaliDate: e.target.checked })}
+            />
+            <label htmlFor="autoBengaliDate">অটো বাংলা কনভার্ট</label>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="customDateText">তারিখের কাস্টম টেক্সট (ঐচ্ছিক)</label>
+          <input
+            type="text"
+            id="customDateText"
+            placeholder="যেমন: ৯ সেপ্টেম্বর ২০২৬"
+            value={state.dateText}
+            onChange={(e) => updateState({ dateText: e.target.value })}
+            style={{ fontFamily: `"${state.dateFont}", var(--font-bangla)` }}
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="dateFontFamily">তারিখের ফন্ট (Date Font)</label>
+          <select
+            id="dateFontFamily"
+            className="font-select"
+            value={state.dateFont}
+            onChange={(e) => updateState({ dateFont: e.target.value })}
+          >
+            <option value="Noto Serif Bengali">Noto Serif Bengali (ডিফল্ট)</option>
+            <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া)</option>
+            <option value="Siyam Rupali">Siyam Rupali (বোল্ড)</option>
+            <option value="SolaimanLipi">SolaimanLipi</option>
+            <option value="AdorshoLipi">AdorshoLipi</option>
+            <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+            <option value="Anek Bangla">Anek Bangla</option>
+            <option value="Tiro Bangla">Tiro Bangla</option>
+            <option value="Baloo Da 2">Baloo Da 2</option>
+            <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
+          </select>
         </div>
       </div>
 
