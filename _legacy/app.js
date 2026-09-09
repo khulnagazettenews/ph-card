@@ -289,11 +289,13 @@ function drawCard() {
   
   // Calculate text wrapping and total height with optional auto-fit scaling
   for (let attempt = 0; attempt < 2; attempt++) {
-    subLineHeight = Math.round(effectiveSubFontSize * 1.35);
     headlineLineHeight = Math.round(effectiveFontSize * 1.38);
+    subLineHeight = Math.round(effectiveSubFontSize * 1.35);
     
-    const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
     const headlineFontString = `700 ${effectiveFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
+    const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+    
+    lines = wrapText(state.headline, maxWidth, headlineFontString, ctx);
     
     if (state.subHeadline && state.subHeadline.trim() !== '') {
       subLines = wrapText(state.subHeadline, maxWidth, subFontString, ctx);
@@ -301,27 +303,25 @@ function drawCard() {
       subLines = [];
     }
     
-    lines = wrapText(state.headline, maxWidth, headlineFontString, ctx);
-    
     gap = subLines.length > 0 ? Math.round(Math.min(26, Math.max(14, effectiveSubFontSize * 0.45))) : 0;
-    subBlockHeight = subLines.length > 0 ? (subLines.length - 1) * subLineHeight + (effectiveSubFontSize * 1.0) : 0;
     headBlockHeight = lines.length > 0 ? (lines.length - 1) * headlineLineHeight + (effectiveFontSize * 1.0) : 0;
-    totalHeight = subBlockHeight + gap + headBlockHeight;
+    subBlockHeight = subLines.length > 0 ? (subLines.length - 1) * subLineHeight + (effectiveSubFontSize * 1.0) : 0;
+    totalHeight = headBlockHeight + gap + subBlockHeight;
     
     // Auto-fit scale down only if total height exceeds available vertical area (260px)
     if (attempt === 0 && totalHeight > maxAvailableHeight) {
       const scaleFactor = Math.max(0.80, maxAvailableHeight / totalHeight);
-      effectiveSubFontSize = Math.max(16, Math.round(state.subFontSize * scaleFactor));
       effectiveFontSize = Math.max(22, Math.round(state.fontSize * scaleFactor));
+      effectiveSubFontSize = Math.max(16, Math.round(state.subFontSize * scaleFactor));
     } else {
       break;
     }
   }
   
   // Vertical bounds and centering (3 suta = 36px gap below 690px news image border)
-  const minTopY = subLines.length > 0 ? 726 : 708; // 3 suta (36px) below image when subheadline is present
+  const minTopY = 715; // Clean top margin below image
   const maxBottomY = 960; // Clear gap above divider line
-  const centerSpaceY = 834; // Midpoint of Y=726 to Y=960
+  const centerSpaceY = 834; // Midpoint of available Y area
   
   let topY = centerSpaceY - (totalHeight / 2);
   topY = Math.max(minTopY, Math.min(topY, maxBottomY - totalHeight));
@@ -332,33 +332,14 @@ function drawCard() {
   ctx.shadowBlur = 3;
   ctx.shadowOffsetY = 2;
   
-  // Draw Sub-Headline
-  if (subLines.length > 0) {
-    const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
-    ctx.fillStyle = state.subHeadlineColor;
-    ctx.textAlign = 'center';
-    ctx.font = subFontString;
-    
-    let currentY = topY + (effectiveSubFontSize * 0.82);
-    for (let i = 0; i < subLines.length; i++) {
-      ctx.fillText(subLines[i], textX, currentY);
-      if (i < subLines.length - 1) {
-        currentY += subLineHeight;
-      }
-    }
-  }
-  
-  // Draw Headline
+  // 1. Draw Main Headline (Top)
   if (lines.length > 0) {
     const headlineFontString = `700 ${effectiveFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
     ctx.fillStyle = state.headlineColor;
     ctx.textAlign = 'center';
     ctx.font = headlineFontString;
     
-    let currentY = subLines.length > 0 
-      ? topY + subBlockHeight + gap + (effectiveFontSize * 0.82)
-      : topY + (effectiveFontSize * 0.82);
-      
+    let currentY = topY + (effectiveFontSize * 0.82);
     for (let i = 0; i < lines.length; i++) {
       ctx.fillText(lines[i], textX, currentY);
       if (i < lines.length - 1) {
@@ -366,7 +347,27 @@ function drawCard() {
       }
     }
   }
+
+  // 2. Draw Sub-Headline (Bottom)
+  if (subLines.length > 0) {
+    const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+    ctx.fillStyle = state.subHeadlineColor;
+    ctx.textAlign = 'center';
+    ctx.font = subFontString;
+    
+    let currentY = lines.length > 0
+      ? topY + headBlockHeight + gap + (effectiveSubFontSize * 0.82)
+      : topY + (effectiveSubFontSize * 0.82);
+      
+    for (let i = 0; i < subLines.length; i++) {
+      ctx.fillText(subLines[i], textX, currentY);
+      if (i < subLines.length - 1) {
+        currentY += subLineHeight;
+      }
+    }
+  }
   ctx.restore();
+
 
   // 8. Draw decorative divider line (Glowing horizontal gradient line fading out at both ends)
   ctx.beginPath();
@@ -531,6 +532,67 @@ fitImageBtn.addEventListener('click', () => {
   updateAdjustmentLabels();
   drawCard();
 });
+
+// Interactive Direct Canvas Dragging (Touch & Mouse)
+let isDraggingCanvas = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let initialOffsetX = 0;
+let initialOffsetY = 0;
+
+function getCanvasCoordinates(e) {
+  const rect = canvas.getBoundingClientRect();
+  const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : e.clientX;
+  const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * (canvas.width / rect.width),
+    y: (clientY - rect.top) * (canvas.height / rect.height)
+  };
+}
+
+function startDrag(e) {
+  if (!state.newsImg) return;
+  const coords = getCanvasCoordinates(e);
+  isDraggingCanvas = true;
+  dragStartX = coords.x;
+  dragStartY = coords.y;
+  initialOffsetX = state.newsImgSettings.offsetX;
+  initialOffsetY = state.newsImgSettings.offsetY;
+}
+
+function moveDrag(e) {
+  if (!isDraggingCanvas || !state.newsImg) return;
+  if (e.touches && e.cancelable) e.preventDefault();
+  const coords = getCanvasCoordinates(e);
+  const deltaX = coords.x - dragStartX;
+  const deltaY = coords.y - dragStartY;
+
+  let newX = Math.round(initialOffsetX + deltaX);
+  let newY = Math.round(initialOffsetY + deltaY);
+
+  newX = Math.max(-500, Math.min(500, newX));
+  newY = Math.max(-500, Math.min(500, newY));
+
+  state.newsImgSettings.offsetX = newX;
+  state.newsImgSettings.offsetY = newY;
+  imagePanX.value = newX;
+  imagePanY.value = newY;
+  updateAdjustmentLabels();
+  drawCard();
+}
+
+function endDrag() {
+  isDraggingCanvas = false;
+}
+
+canvas.addEventListener('mousedown', startDrag);
+window.addEventListener('mousemove', moveDrag);
+window.addEventListener('mouseup', endDrag);
+
+canvas.addEventListener('touchstart', startDrag, { passive: false });
+window.addEventListener('touchmove', moveDrag, { passive: false });
+window.addEventListener('touchend', endDrag);
+
 
 // Event Bindings: Headline & Details
 headlineInput.addEventListener('input', (e) => {

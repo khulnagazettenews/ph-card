@@ -133,6 +133,43 @@
         <div class="panel-section">
           <h2 class="section-title"><span class="section-num">৩</span> শিরোনাম ও বিবরণ</h2>
           
+          <!-- Main Headline -->
+          <div class="form-group">
+            <label for="headlineInput">মূল শিরোনাম (Headline)</label>
+            <textarea id="headlineInput" rows="3" placeholder="এখানে সংবাদের মূল শিরোনাম লিখুন..."></textarea>
+            <div class="char-counter"><span id="charCount">০</span> অক্ষর</div>
+          </div>
+
+          <div class="form-group range-group">
+            <div class="range-header">
+              <span>মূল শিরোনাম ফন্ট সাইজ (Headline Font Size)</span>
+              <span id="fontSizeDisplay">৫০px</span>
+            </div>
+            <input type="range" id="headlineFontSize" min="24" max="80" value="50">
+          </div>
+
+          <div class="form-group">
+            <label for="headlineFontFamily">মূল শিরোনাম ফন্ট (Headline Font)</label>
+            <select id="headlineFontFamily" class="font-select">
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="SutonnyMJ" selected>SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
+            </select>
+          </div>
+
+          <!-- Sub Headline -->
           <div class="form-group">
             <label for="subHeadlineInput">উপ-শিরোনাম (Sub Headline)</label>
             <input type="text" id="subHeadlineInput" placeholder="এখানে উপ-শিরোনাম লিখুন (ঐচ্ছিক)">
@@ -167,56 +204,8 @@
             </select>
           </div>
 
-          <div class="form-group">
-            <label for="headlineInput">মূল শিরোনাম (Headline)</label>
-            <textarea id="headlineInput" rows="3" placeholder="এখানে সংবাদের মূল শিরোনাম লিখুন..."></textarea>
-            <div class="char-counter"><span id="charCount">০</span> অক্ষর</div>
-          </div>
-
-          <div class="form-group range-group">
-            <div class="range-header">
-              <span>ফন্ট সাইজ (Font Size)</span>
-              <span id="fontSizeDisplay">৫০px</span>
-            </div>
-            <input type="range" id="headlineFontSize" min="24" max="80" value="50">
-          </div>
-
-          <div class="form-group">
-            <label for="headlineFontFamily">মূল শিরোনাম ফন্ট (Headline Font)</label>
-            <select id="headlineFontFamily" class="font-select">
-              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
-              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
-              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
-              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
-              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
-              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
-              <option value="Anek Bangla">Anek Bangla</option>
-              <option value="Tiro Bangla">Tiro Bangla</option>
-              <option value="Baloo Da 2">Baloo Da 2</option>
-              <option value="Mina">Mina</option>
-              <option value="Galada">Galada</option>
-              <option value="Atma">Atma</option>
-              <option value="SutonnyMJ" selected>SutonnyMJ (ANSI)</option>
-              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
-              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
-            </select>
-          </div>
-
+          <!-- Colors -->
           <div class="color-pickers-group">
-            <div class="form-group color-input-wrap">
-              <label>উপ-শিরোনামের রং</label>
-              <div class="color-presets" id="subColorPresets">
-                <span class="color-dot active" data-color="#f8fafc" style="background-color: #f8fafc;"></span>
-                <span class="color-dot" data-color="#facc15" style="background-color: #facc15;"></span>
-                <span class="color-dot" data-color="#38bdf8" style="background-color: #38bdf8;"></span>
-                <span class="color-dot" data-color="#f87171" style="background-color: #f87171;"></span>
-                <div class="custom-color-picker">
-                  <input type="color" id="subHeadlineColor" value="#f8fafc">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
-                </div>
-              </div>
-            </div>
-            
             <div class="form-group color-input-wrap">
               <label>মূল শিরোনামের রং</label>
               <div class="color-presets" id="headColorPresets">
@@ -230,8 +219,23 @@
                 </div>
               </div>
             </div>
+
+            <div class="form-group color-input-wrap">
+              <label>উপ-শিরোনামের রং</label>
+              <div class="color-presets" id="subColorPresets">
+                <span class="color-dot active" data-color="#f8fafc" style="background-color: #f8fafc;"></span>
+                <span class="color-dot" data-color="#facc15" style="background-color: #facc15;"></span>
+                <span class="color-dot" data-color="#38bdf8" style="background-color: #38bdf8;"></span>
+                <span class="color-dot" data-color="#f87171" style="background-color: #f87171;"></span>
+                <div class="custom-color-picker">
+                  <input type="color" id="subHeadlineColor" value="#f8fafc">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+
 
         <div class="panel-section">
           <h2 class="section-title"><span class="section-num">৪</span> ওয়েবসাইট ও বিজ্ঞাপন</h2>

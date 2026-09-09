@@ -196,21 +196,8 @@ body {
   overflow: hidden;
 }
 
-@media (max-width: 900px) {
-  .app-content {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-    overflow-y: auto;
-  }
-  .app-container {
-    height: auto;
-    overflow: visible;
-  }
-  .control-panel {
-    height: auto;
-    overflow-y: visible !important;
-  }
-}
+
+
 
 /* Scrollable panels */
 .scrollable {
@@ -905,3 +892,217 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .app-container.hidden {
   display: none !important;
 }
+
+/* ==========================================================================
+   Mobile & Responsive Enhancements
+   ========================================================================== */
+@media (max-width: 900px) {
+  html, body {
+    overflow-x: hidden;
+  }
+
+  .app-container {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding-bottom: 84px; /* Space for sticky bottom download bar */
+  }
+
+  .app-header {
+    padding: 10px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .brand-logo-img {
+    height: 32px;
+  }
+
+  .logo-sub {
+    font-size: 12px;
+    padding: 2px 6px;
+  }
+
+  .app-content {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  /* Live Preview sticky/top placement on mobile */
+  .preview-panel {
+    order: -1;
+    position: sticky;
+    top: 53px; /* Header height */
+    z-index: 90;
+    padding: 12px 16px;
+    background: var(--bg-app);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .preview-container {
+    max-height: 40vh;
+    max-width: 100%;
+    gap: 8px;
+  }
+
+  .preview-header {
+    padding: 0 4px;
+  }
+
+  .preview-header h3 {
+    font-size: 13px;
+  }
+
+  .badge-status {
+    font-size: 9px;
+    padding: 3px 8px;
+  }
+
+  .canvas-wrapper {
+    padding: 8px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  #cardCanvas {
+    max-height: 32vh;
+    width: auto;
+    max-width: 100%;
+    touch-action: none; /* Smooth touch dragging without page scroll */
+    cursor: grab;
+  }
+
+  #cardCanvas:active {
+    cursor: grabbing;
+  }
+
+  .preview-helper-text {
+    font-size: 10px;
+    display: none; /* Hide secondary hint on small screens to save vertical space */
+  }
+
+  /* Control panel mobile optimization */
+  .control-panel {
+    padding: 16px;
+    height: auto;
+    overflow: visible !important;
+    gap: 18px;
+    box-shadow: none;
+    border-right: none;
+  }
+
+  .panel-section {
+    padding-bottom: 18px;
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 16px;
+  }
+
+  /* Larger touch targets for mobile inputs */
+  input[type="text"],
+  input[type="date"],
+  select.font-select,
+  textarea {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .color-dot {
+    width: 28px;
+    height: 28px;
+  }
+
+  .custom-color-picker {
+    width: 28px;
+    height: 28px;
+  }
+
+  .color-presets {
+    padding: 6px 12px;
+  }
+
+  /* Adjust range thumbs for finger touch */
+  input[type="range"]::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Sticky download action bar at bottom of mobile screen */
+  .action-section {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px 16px;
+    background-color: var(--bg-panel);
+    backdrop-filter: var(--glass-blur);
+    border-top: 1px solid var(--border-color);
+    z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .primary-btn {
+    padding: 14px 20px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  /* Login Overlay Responsive */
+  .login-box {
+    padding: 24px 18px;
+    width: 92%;
+    max-width: 380px;
+    gap: 16px;
+    border-radius: 14px;
+  }
+
+  .login-logo-img {
+    height: 38px;
+  }
+
+  .login-header h2 {
+    font-size: 19px;
+  }
+
+  .login-header p {
+    font-size: 12px;
+  }
+
+  .login-btn {
+    padding: 14px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .inline-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .checkbox-wrap {
+    margin-bottom: 4px;
+  }
+
+  .adjustment-grids {
+    grid-template-columns: 1fr;
+  }
+
+  .ad-selector-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .color-pickers-group {
+    grid-template-columns: 1fr;
+  }
+}
+
