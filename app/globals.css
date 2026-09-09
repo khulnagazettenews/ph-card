@@ -221,6 +221,45 @@ body {
   box-shadow: 2px 0 20px rgba(0, 0, 0, 0.19);
 }
 
+/* Card Type Switcher Tabs */
+.card-type-selector {
+  display: flex;
+  background-color: var(--bg-control);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.type-tab-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-bangla);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.type-tab-btn:hover {
+  color: var(--text-main);
+  background-color: var(--bg-control-hover);
+}
+
+.type-tab-btn.active {
+  background-color: var(--accent-color);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
 .panel-section {
   display: flex;
   flex-direction: column;

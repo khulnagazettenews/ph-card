@@ -44,6 +44,199 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
     // 1. Clear Canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // If Card Type is 'quote'
+    if (state.cardType === 'quote') {
+      // 1. Clear Canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 2. Draw Card Background image
+      if (state.quoteBgImg) {
+        ctx.drawImage(state.quoteBgImg, 0, 0, canvas.width, 1080);
+      } else if (state.bgImg) {
+        ctx.drawImage(state.bgImg, 0, 0, canvas.width, 1080);
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, 1080);
+      }
+
+      // 3. Date (Top Right)
+      if (state.dateText) {
+        ctx.save();
+        ctx.fillStyle = '#111111';
+        ctx.font = `700 28px "${state.dateFont}"${BANGLA_FONT_FALLBACKS}`;
+        ctx.textAlign = 'right';
+        ctx.fillText(state.dateText, 960, 68);
+
+        // Thin red line under date
+        ctx.beginPath();
+        ctx.moveTo(760, 92);
+        ctx.lineTo(960, 92);
+        ctx.strokeStyle = '#d92323';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 4. Exact Solid Red Double Quote Symbol (matching the reference image 66 shape)
+      ctx.save();
+      ctx.fillStyle = '#d92323';
+
+      // First quote comma circle & tail
+      ctx.beginPath();
+      ctx.arc(118, 105, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(102, 114);
+      ctx.quadraticCurveTo(90, 142, 114, 148);
+      ctx.quadraticCurveTo(106, 134, 118, 124);
+      ctx.closePath();
+      ctx.fill();
+
+      // Second quote comma circle & tail
+      ctx.beginPath();
+      ctx.arc(160, 105, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(144, 114);
+      ctx.quadraticCurveTo(132, 142, 156, 148);
+      ctx.quadraticCurveTo(148, 134, 160, 124);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // 5. Quote Text (Left Side Main Body)
+      const quoteX = 95;
+      const maxQuoteWidth = 670; // Leaves space for person image on right
+      const quoteFontSize = state.quoteFontSize || 38;
+      const quoteFontString = `700 ${quoteFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
+
+      const quoteLines = wrapText(state.quoteText, maxQuoteWidth, quoteFontString, ctx);
+      const quoteLineHeight = Math.round(quoteFontSize * 1.42);
+
+      ctx.save();
+      ctx.fillStyle = state.quoteTextColor || '#111111';
+      ctx.font = quoteFontString;
+      ctx.textAlign = 'left';
+
+      let currentY = 225;
+      for (let i = 0; i < quoteLines.length; i++) {
+        ctx.fillText(quoteLines[i], quoteX, currentY);
+        currentY += quoteLineHeight;
+      }
+      ctx.restore();
+
+      // Red separator line under Quote Text
+      const lineY = Math.max(currentY + 20, 580);
+      ctx.beginPath();
+      ctx.moveTo(quoteX, lineY);
+      ctx.lineTo(quoteX + 310, lineY);
+      ctx.strokeStyle = '#d92323';
+      ctx.lineWidth = 3.5;
+      ctx.stroke();
+
+      // 6. Person Name & Designation (Under Red Line)
+      let nameY = lineY + 45;
+
+      // Person Name (Bold)
+      if (state.personName) {
+        ctx.save();
+        ctx.fillStyle = state.personNameColor || '#111111';
+        ctx.font = `700 ${state.personNameFontSize || 34}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        ctx.textAlign = 'left';
+        ctx.fillText(state.personName, quoteX, nameY);
+        ctx.restore();
+      }
+
+      // Person Designation (Multiple lines support)
+      if (state.personDesignation) {
+        ctx.save();
+        ctx.fillStyle = state.personDesignationColor || '#111111';
+        ctx.font = `600 ${state.personDesignationFontSize || 25}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        ctx.textAlign = 'left';
+
+        const desigLines = state.personDesignation.split('\n');
+        const desigLineHeight = Math.round((state.personDesignationFontSize || 25) * 1.35);
+        let desigY = nameY + (state.personNameFontSize || 34) + 8;
+
+        for (let i = 0; i < desigLines.length; i++) {
+          ctx.fillText(desigLines[i], quoteX, desigY);
+          desigY += desigLineHeight;
+        }
+        ctx.restore();
+      }
+
+      // 7. Person Photo (Right Bottom cutout overlay)
+      if (state.personImg) {
+        ctx.save();
+        const pX = 680 + (state.personImgSettings?.offsetX || 0);
+        const pY = 710 + (state.personImgSettings?.offsetY || 0);
+        const pScale = state.personImgSettings?.scale || 1.0;
+
+        ctx.translate(pX, pY);
+        ctx.scale(pScale, pScale);
+        ctx.drawImage(state.personImg, -state.personImg.width / 2, -state.personImg.height / 2);
+        ctx.restore();
+      } else {
+        // Placeholder for Person Image
+        ctx.save();
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.35)';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(720, 680, 175, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = `600 20px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('ব্যক্তির ছবি আপলোড করুন', 720, 685);
+        ctx.restore();
+      }
+
+      // 8. Logo at Bottom Left (Khulna Gazette Brand logo + Tagline)
+      if (state.logoImg) {
+        ctx.drawImage(state.logoImg, 65, 825, 300, 85);
+
+        // Tagline text with decorative lines
+        ctx.save();
+        ctx.fillStyle = '#475569';
+        ctx.font = `600 16px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('সত্যের পথে, মানুষের পাশে', 215, 925);
+
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(95, 920);
+        ctx.lineTo(135, 920);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(295, 920);
+        ctx.lineTo(335, 920);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 9. Footer Ad Banner (Bottom 120px)
+      if (state.adImg) {
+        ctx.drawImage(state.adImg, 0, 1080, canvas.width, 120);
+      } else {
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(0, 1080, canvas.width, 120);
+      }
+
+      return;
+    }
+
+    // --- DEFAULT NEWS CARD RENDERING ---
+    // 1. Clear Canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     // 2. Draw Card Background image (assets/card_bg.jpg)
     if (state.bgImg) {
       ctx.drawImage(state.bgImg, 0, 0, canvas.width, 1080);
@@ -289,18 +482,28 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
   };
 
   const handleStartDrag = (e) => {
-    if (!state.newsImg) return;
     const coords = getCanvasCoordinates(e);
-    isDraggingCanvasRef.current = true;
-    dragStartRef.current = coords;
-    initialOffsetRef.current = {
-      x: state.newsImgSettings.offsetX,
-      y: state.newsImgSettings.offsetY
-    };
+    if (state.cardType === 'quote') {
+      if (!state.personImg) return;
+      isDraggingCanvasRef.current = true;
+      dragStartRef.current = coords;
+      initialOffsetRef.current = {
+        x: state.personImgSettings?.offsetX || 0,
+        y: state.personImgSettings?.offsetY || 0
+      };
+    } else {
+      if (!state.newsImg) return;
+      isDraggingCanvasRef.current = true;
+      dragStartRef.current = coords;
+      initialOffsetRef.current = {
+        x: state.newsImgSettings.offsetX,
+        y: state.newsImgSettings.offsetY
+      };
+    }
   };
 
   const handleMoveDrag = useCallback((e) => {
-    if (!isDraggingCanvasRef.current || !state.newsImg) return;
+    if (!isDraggingCanvasRef.current) return;
     if (e.touches && e.cancelable) e.preventDefault();
     const coords = getCanvasCoordinates(e);
     const deltaX = coords.x - dragStartRef.current.x;
@@ -309,17 +512,29 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
     let newX = Math.round(initialOffsetRef.current.x + deltaX);
     let newY = Math.round(initialOffsetRef.current.y + deltaY);
 
-    newX = Math.max(-500, Math.min(500, newX));
-    newY = Math.max(-500, Math.min(500, newY));
+    newX = Math.max(-600, Math.min(600, newX));
+    newY = Math.max(-600, Math.min(600, newY));
 
-    updateState({
-      newsImgSettings: {
-        ...state.newsImgSettings,
-        offsetX: newX,
-        offsetY: newY
-      }
-    });
-  }, [state.newsImg, state.newsImgSettings, updateState]);
+    if (state.cardType === 'quote') {
+      if (!state.personImg) return;
+      updateState({
+        personImgSettings: {
+          ...state.personImgSettings,
+          offsetX: newX,
+          offsetY: newY
+        }
+      });
+    } else {
+      if (!state.newsImg) return;
+      updateState({
+        newsImgSettings: {
+          ...state.newsImgSettings,
+          offsetX: newX,
+          offsetY: newY
+        }
+      });
+    }
+  }, [state.cardType, state.personImg, state.personImgSettings, state.newsImg, state.newsImgSettings, updateState]);
 
   const handleEndDrag = () => {
     isDraggingCanvasRef.current = false;

@@ -69,6 +69,25 @@ export default function GeneratorPage() {
     selectedDate: '',
     autoBengaliDate: true,
     dateText: '',
+    cardType: 'news', // 'news' or 'quote'
+    // Quote Card state fields
+    quoteText: 'আজকে অনেক সংকটের মধ্যেও আমাদের প্রধানমন্ত্রী তারেক রহমান দেশের নেতৃত্ব দিচ্ছেন। তিনি যে কর্মসূচি ও রাষ্ট্রীয় দায়িত্ব সুচারুভাবে পালন করছেন, তার মাধ্যমে প্রমাণিত হয়েছে— একজন দেশপ্রেমিক ব্যক্তিত্ব ক্ষমতায় থাকলে জনগণের স্বার্থকেই সবচেয়ে বড় করে দেখেন।',
+    personName: 'রুহুল কবীর রিজভী',
+    personDesignation: 'প্রধানমন্ত্রীর উপদেষ্টা ও ভারপ্রাপ্ত মহাসচিব\nবিএনপি',
+    personImg: null,
+    personImgSettings: {
+      scale: 1.0,
+      offsetX: 0,
+      offsetY: 0
+    },
+    quoteFontSize: 36,
+    personNameFontSize: 32,
+    personDesignationFontSize: 24,
+    quoteTextColor: '#111111',
+    personNameColor: '#111111',
+    personDesignationColor: '#111111',
+
+    // News Card state fields
     subHeadline: '',
     subFontSize: 30,
     subHeadlineColor: '#f8fafc',
@@ -126,15 +145,17 @@ export default function GeneratorPage() {
     const bengaliDate = formatDateToBengali(today);
 
     Promise.all([
-      loadImage('/assets/logo.png'),
-      loadImage('/assets/ad_road_home.png'),
-      loadImage('/assets/card_bg.jpg')
-    ]).then(([logo, ad1, bg]) => {
+      loadImage('/assets/logo.png').catch(() => null),
+      loadImage('/assets/ad_road_home.png').catch(() => null),
+      loadImage('/assets/card_bg.jpg').catch(() => null),
+      loadImage('/assets/bg-image.png').catch(() => null)
+    ]).then(([logo, ad1, bg, quoteBg]) => {
       setCardState(prev => ({
         ...prev,
         logoImg: logo,
         adImg: ad1,
         bgImg: bg,
+        quoteBgImg: quoteBg,
         selectedDate: formattedDate,
         dateText: bengaliDate
       }));
@@ -163,6 +184,64 @@ export default function GeneratorPage() {
           }
         }));
       });
+    };
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handlePersonImageUpload = useCallback(async (file, autoRemoveBg = true) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const origDataUrl = e.target?.result;
+      const originalImg = await loadImage(origDataUrl);
+      const targetW = 600;
+      const scaleW = targetW / originalImg.width;
+
+      setCardState(prev => ({
+        ...prev,
+        isRemovingBg: autoRemoveBg,
+        personImg: originalImg,
+        personImgSettings: {
+          scale: scaleW || 1.0,
+          offsetX: 0,
+          offsetY: 0
+        }
+      }));
+
+      if (autoRemoveBg) {
+        try {
+          // Convert input image to a clean PNG Blob to prevent format errors (e.g. image/avif)
+          const canvas = document.createElement('canvas');
+          canvas.width = originalImg.width;
+          canvas.height = originalImg.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(originalImg, 0, 0);
+
+          const cleanPngBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (!cleanPngBlob) throw new Error('Failed to convert image to PNG');
+
+          const { removeBackground } = await import('@imgly/background-removal');
+          const blob = await removeBackground(cleanPngBlob);
+
+          const blobReader = new FileReader();
+          blobReader.onload = async (evt) => {
+            const processedDataUrl = evt.target?.result;
+            if (processedDataUrl) {
+              const bgRemovedImg = await loadImage(processedDataUrl);
+              setCardState(prev => ({
+                ...prev,
+                isRemovingBg: false,
+                personImg: bgRemovedImg
+              }));
+            }
+          };
+          blobReader.readAsDataURL(blob);
+        } catch (err) {
+          console.error('Auto BG removal error:', err);
+          setCardState(prev => ({ ...prev, isRemovingBg: false }));
+        }
+      }
     };
     reader.readAsDataURL(file);
   }, []);
@@ -227,6 +306,7 @@ export default function GeneratorPage() {
           updateState={updateState}
           onDownload={handleDownload}
           onImageUpload={handleNewsImageUpload}
+          onPersonImageUpload={handlePersonImageUpload}
           onAdPresetChange={handleAdPresetChange}
           onCustomAdUpload={handleCustomAdUpload}
         />
