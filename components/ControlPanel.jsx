@@ -287,6 +287,20 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
             />
           </div>
 
+          <div className="form-group range-group">
+            <div className="range-header">
+              <span>নামের ফন্ট সাইজ (Name Font Size)</span>
+              <span>{state.personNameFontSize || 32}px</span>
+            </div>
+            <input
+              type="range"
+              min="18"
+              max="60"
+              value={state.personNameFontSize || 32}
+              onChange={(e) => updateState({ personNameFontSize: parseInt(e.target.value) })}
+            />
+          </div>
+
           {/* Person Designation */}
           <div className="form-group">
             <label htmlFor="personDesignationInput">পদবি ও দল/প্রতিষ্ঠান (Designation)</label>
@@ -297,6 +311,20 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
               value={state.personDesignation}
               onChange={(e) => updateState({ personDesignation: e.target.value })}
               style={{ fontFamily: `"${state.subHeadlineFont}", var(--font-bangla)` }}
+            />
+          </div>
+
+          <div className="form-group range-group">
+            <div className="range-header">
+              <span>পদবির ফন্ট সাইজ (Designation Font Size)</span>
+              <span>{state.personDesignationFontSize || 24}px</span>
+            </div>
+            <input
+              type="range"
+              min="14"
+              max="45"
+              value={state.personDesignationFontSize || 24}
+              onChange={(e) => updateState({ personDesignationFontSize: parseInt(e.target.value) })}
             />
           </div>
 

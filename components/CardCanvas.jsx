@@ -49,7 +49,7 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
       // 1. Clear Canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // 2. Draw Card Background image
+      // 2. Draw Main Card Background image (bg-image.png)
       if (state.quoteBgImg) {
         ctx.drawImage(state.quoteBgImg, 0, 0, canvas.width, 1080);
       } else if (state.bgImg) {
@@ -59,7 +59,46 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
         ctx.fillRect(0, 0, canvas.width, 1080);
       }
 
-      // 3. Date (Top Right)
+      // 3. Draw Person Photo (Clipped along the bottom red curve so it sits BEHIND the red wave and black footer)
+      if (state.personImg) {
+        ctx.save();
+
+        // Curved clipping path following the top boundary of the bottom red wave exactly
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(canvas.width, 0);
+        ctx.lineTo(canvas.width, 875);
+        ctx.quadraticCurveTo(600, 960, 0, 992);
+        ctx.closePath();
+        ctx.clip();
+
+        const pX = 720 + (state.personImgSettings?.offsetX || 0);
+        const pY = 820 + (state.personImgSettings?.offsetY || 0);
+        const pScale = state.personImgSettings?.scale || 1.0;
+
+        ctx.translate(pX, pY);
+        ctx.scale(pScale, pScale);
+        ctx.drawImage(state.personImg, -state.personImg.width / 2, -state.personImg.height / 2);
+        ctx.restore();
+      } else {
+        // Placeholder for Person Image (Positioned lower down near bottom wave)
+        ctx.save();
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.35)';
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(720, 810, 150, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = `600 20px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        ctx.textAlign = 'center';
+        ctx.fillText('ব্যক্তির ছবি আপলোড করুন', 720, 815);
+        ctx.restore();
+      }
+
+      // 4. Date (Top Right)
       if (state.dateText) {
         ctx.save();
         ctx.fillStyle = '#111111';
@@ -77,7 +116,7 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
         ctx.restore();
       }
 
-      // 4. Exact Solid Red Double Quote Symbol (matching the reference image 66 shape)
+      // 5. Exact Solid Red Double Quote Symbol (matching the reference image 66 shape)
       ctx.save();
       ctx.fillStyle = '#d92323';
 
@@ -106,38 +145,63 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
       ctx.fill();
       ctx.restore();
 
-      // 5. Quote Text (Left Side Main Body)
+      // 6. Quote Text (Dynamic Curved Wrap around Person Photo)
       const quoteX = 95;
-      const maxQuoteWidth = 670; // Leaves space for person image on right
       const quoteFontSize = state.quoteFontSize || 38;
       const quoteFontString = `700 ${quoteFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
-
-      const quoteLines = wrapText(state.quoteText, maxQuoteWidth, quoteFontString, ctx);
       const quoteLineHeight = Math.round(quoteFontSize * 1.42);
+      const startY = 225;
+
+      // Function to get max width based on Y position (curving around person photo)
+      const getWidthAtY = (y) => {
+        // Person photo center is at X=720, Y=820.
+        // As Y gets closer to person photo top (Y >= 350), reduce text width to curve around photo
+        if (y < 340) return 720;
+        if (y < 460) return 600;
+        if (y < 580) return 520;
+        return 490;
+      };
 
       ctx.save();
       ctx.fillStyle = state.quoteTextColor || '#111111';
       ctx.font = quoteFontString;
       ctx.textAlign = 'left';
 
-      let currentY = 225;
-      for (let i = 0; i < quoteLines.length; i++) {
-        ctx.fillText(quoteLines[i], quoteX, currentY);
-        currentY += quoteLineHeight;
+      // Dynamic wrap text word by word
+      const words = (state.quoteText || '').split(' ');
+      let currentLine = '';
+      let lineY = startY;
+
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        const maxW = getWidthAtY(lineY);
+        const metrics = ctx.measureText(testLine);
+
+        if (metrics.width > maxW && currentLine) {
+          ctx.fillText(currentLine, quoteX, lineY);
+          lineY += quoteLineHeight;
+          currentLine = word;
+        } else {
+          currentLine = testLine;
+        }
+      }
+      if (currentLine) {
+        ctx.fillText(currentLine, quoteX, lineY);
       }
       ctx.restore();
 
       // Red separator line under Quote Text
-      const lineY = Math.max(currentY + 20, 580);
+      const lineYEnd = Math.max(lineY + 30, 620);
       ctx.beginPath();
-      ctx.moveTo(quoteX, lineY);
-      ctx.lineTo(quoteX + 310, lineY);
+      ctx.moveTo(quoteX, lineYEnd);
+      ctx.lineTo(quoteX + 310, lineYEnd);
       ctx.strokeStyle = '#d92323';
       ctx.lineWidth = 3.5;
       ctx.stroke();
 
-      // 6. Person Name & Designation (Under Red Line)
-      let nameY = lineY + 45;
+      // 7. Person Name & Designation (Positioned lower under Red Line)
+      let nameY = lineYEnd + 55;
 
       // Person Name (Bold)
       if (state.personName) {
@@ -167,59 +231,9 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
         ctx.restore();
       }
 
-      // 7. Person Photo (Right Bottom cutout overlay)
-      if (state.personImg) {
-        ctx.save();
-        const pX = 680 + (state.personImgSettings?.offsetX || 0);
-        const pY = 710 + (state.personImgSettings?.offsetY || 0);
-        const pScale = state.personImgSettings?.scale || 1.0;
-
-        ctx.translate(pX, pY);
-        ctx.scale(pScale, pScale);
-        ctx.drawImage(state.personImg, -state.personImg.width / 2, -state.personImg.height / 2);
-        ctx.restore();
-      } else {
-        // Placeholder for Person Image
-        ctx.save();
-        ctx.fillStyle = 'rgba(200, 200, 200, 0.35)';
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(720, 680, 175, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#64748b';
-        ctx.font = `600 20px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
-        ctx.textAlign = 'center';
-        ctx.fillText('ব্যক্তির ছবি আপলোড করুন', 720, 685);
-        ctx.restore();
-      }
-
-      // 8. Logo at Bottom Left (Khulna Gazette Brand logo + Tagline)
+      // 8. Logo at Bottom Left (Khulna Gazette Brand logo)
       if (state.logoImg) {
-        ctx.drawImage(state.logoImg, 65, 825, 300, 85);
-
-        // Tagline text with decorative lines
-        ctx.save();
-        ctx.fillStyle = '#475569';
-        ctx.font = `600 16px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
-        ctx.textAlign = 'center';
-        ctx.fillText('সত্যের পথে, মানুষের পাশে', 215, 925);
-
-        ctx.strokeStyle = '#cbd5e1';
-        ctx.lineWidth = 1;
-
-        ctx.beginPath();
-        ctx.moveTo(95, 920);
-        ctx.lineTo(135, 920);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(295, 920);
-        ctx.lineTo(335, 920);
-        ctx.stroke();
-        ctx.restore();
+        ctx.drawImage(state.logoImg, 65, 835, 300, 85);
       }
 
       // 9. Footer Ad Banner (Bottom 120px)
