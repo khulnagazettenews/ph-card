@@ -31,7 +31,12 @@ export const authOptions = {
     signIn: '/login'
   },
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 দিন (30 Days)
+    updateAge: 24 * 60 * 60 // ২৪ ঘণ্টা পর পর সেশন রিফ্রেশ হবে
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60 // 30 দিন
   },
   secret: process.env.NEXTAUTH_SECRET || 'khulna-gazette-secret-key-2026'
 };
