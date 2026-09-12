@@ -253,7 +253,7 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
               placeholder="এখানে উক্তি বা বক্তব্য লিখুন..."
               value={state.quoteText}
               onChange={(e) => updateState({ quoteText: e.target.value })}
-              style={{ fontFamily: `"${state.headlineFont}", var(--font-bangla)` }}
+              style={{ fontFamily: `"${state.quoteFont || state.headlineFont || 'Hind Siliguri'}", var(--font-bangla)` }}
             />
             <div className="char-counter">
               <span>{translateToBengaliDigits(state.quoteText.length)}</span> অক্ষর
@@ -274,6 +274,32 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="quoteFontFamily">উক্তির ফন্ট (Quote Font)</label>
+            <select
+              id="quoteFontFamily"
+              className="font-select"
+              value={state.quoteFont || state.headlineFont || 'Hind Siliguri'}
+              onChange={(e) => updateState({ quoteFont: e.target.value })}
+            >
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
+            </select>
+          </div>
+
           {/* Person Name */}
           <div className="form-group">
             <label htmlFor="personNameInput">ব্যক্তির নাম (Person Name)</label>
@@ -283,7 +309,7 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
               placeholder="যেমন: রুহুল কবীর রিজভী"
               value={state.personName}
               onChange={(e) => updateState({ personName: e.target.value })}
-              style={{ fontFamily: `"${state.subHeadlineFont}", var(--font-bangla)` }}
+              style={{ fontFamily: `"${state.personNameFont || state.subHeadlineFont || 'Hind Siliguri'}", var(--font-bangla)` }}
             />
           </div>
 
@@ -301,6 +327,32 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
             />
           </div>
 
+          <div className="form-group">
+            <label htmlFor="personNameFontFamily">নামের ফন্ট (Name Font)</label>
+            <select
+              id="personNameFontFamily"
+              className="font-select"
+              value={state.personNameFont || state.subHeadlineFont || 'Hind Siliguri'}
+              onChange={(e) => updateState({ personNameFont: e.target.value })}
+            >
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
+            </select>
+          </div>
+
           {/* Person Designation */}
           <div className="form-group">
             <label htmlFor="personDesignationInput">পদবি ও দল/প্রতিষ্ঠান (Designation)</label>
@@ -310,7 +362,7 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
               placeholder="যেমন: প্রধানমন্ত্রীর উপদেষ্টা ও ভারপ্রাপ্ত মহাসচিব&#10;বিএনপি"
               value={state.personDesignation}
               onChange={(e) => updateState({ personDesignation: e.target.value })}
-              style={{ fontFamily: `"${state.subHeadlineFont}", var(--font-bangla)` }}
+              style={{ fontFamily: `"${state.personDesignationFont || state.subHeadlineFont || 'Hind Siliguri'}", var(--font-bangla)` }}
             />
           </div>
 
@@ -326,6 +378,32 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
               value={state.personDesignationFontSize || 24}
               onChange={(e) => updateState({ personDesignationFontSize: parseInt(e.target.value) })}
             />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="personDesignationFontFamily">পদবির ফন্ট (Designation Font)</label>
+            <select
+              id="personDesignationFontFamily"
+              className="font-select"
+              value={state.personDesignationFont || state.subHeadlineFont || 'Hind Siliguri'}
+              onChange={(e) => updateState({ personDesignationFont: e.target.value })}
+            >
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
+            </select>
           </div>
 
           {/* Color pickers */}

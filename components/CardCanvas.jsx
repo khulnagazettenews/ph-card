@@ -148,7 +148,8 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
       // 6. Quote Text (Dynamic Curved Wrap around Person Photo)
       const quoteX = 95;
       const quoteFontSize = state.quoteFontSize || 38;
-      const quoteFontString = `700 ${quoteFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
+      const quoteFontFamily = state.quoteFont || state.headlineFont || 'Hind Siliguri';
+      const quoteFontString = `700 ${quoteFontSize}px "${quoteFontFamily}"${BANGLA_FONT_FALLBACKS}`;
       const quoteLineHeight = Math.round(quoteFontSize * 1.42);
       const startY = 225;
 
@@ -207,7 +208,8 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
       if (state.personName) {
         ctx.save();
         ctx.fillStyle = state.personNameColor || '#111111';
-        ctx.font = `700 ${state.personNameFontSize || 34}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        const nameFontFamily = state.personNameFont || state.subHeadlineFont || 'Hind Siliguri';
+        ctx.font = `700 ${state.personNameFontSize || 34}px "${nameFontFamily}"${BANGLA_FONT_FALLBACKS}`;
         ctx.textAlign = 'left';
         ctx.fillText(state.personName, quoteX, nameY);
         ctx.restore();
@@ -217,7 +219,8 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
       if (state.personDesignation) {
         ctx.save();
         ctx.fillStyle = state.personDesignationColor || '#111111';
-        ctx.font = `600 ${state.personDesignationFontSize || 25}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
+        const desigFontFamily = state.personDesignationFont || state.subHeadlineFont || 'Hind Siliguri';
+        ctx.font = `600 ${state.personDesignationFontSize || 25}px "${desigFontFamily}"${BANGLA_FONT_FALLBACKS}`;
         ctx.textAlign = 'left';
 
         const desigLines = state.personDesignation.split('\n');

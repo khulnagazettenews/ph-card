@@ -86,6 +86,9 @@ export default function GeneratorPage() {
     quoteTextColor: '#111111',
     personNameColor: '#111111',
     personDesignationColor: '#111111',
+    quoteFont: 'Hind Siliguri',
+    personNameFont: 'Hind Siliguri',
+    personDesignationFont: 'Hind Siliguri',
 
     // News Card state fields
     subHeadline: '',
