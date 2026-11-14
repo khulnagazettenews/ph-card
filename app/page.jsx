@@ -162,13 +162,23 @@ export default function GeneratorPage() {
                 adImg: img,
                 activeAdKey: data.ads[0].id
               }));
-            }).catch(() => {});
+            }).catch(() => { });
           }
           return prev;
         });
       }
     } catch (err) {
       console.error('Error fetching ads from MongoDB:', err);
+      // Fallback to default presets if network/server completely fails
+      const fallback = [
+        { id: 'preset-1', title: 'Road Home', imageUrl: '/assets/ad_road_home.png', isDefault: true },
+        { id: 'preset-2', title: 'ACI Water Pump', imageUrl: '/assets/ad_aci_water_pump.png', isDefault: true },
+        { id: 'preset-3', title: 'ACI Smart Tools', imageUrl: '/assets/ad_aci_smart_tools.png', isDefault: true }
+      ];
+      setAdsList(fallback);
+      loadImage('/assets/ad_road_home.png').then(img => {
+        setCardState(s => (!s.adImg ? { ...s, adImg: img, activeAdKey: 'preset-1' } : s));
+      }).catch(() => { });
     } finally {
       setAdsLoading(false);
     }
@@ -227,8 +237,8 @@ export default function GeneratorPage() {
   useEffect(() => {
     // Preload background removal assets for instant processing
     import('@imgly/background-removal').then(({ preload }) => {
-      preload({ model: 'isnet_quint8', debug: false }).catch(() => {});
-    }).catch(() => {});
+      preload({ model: 'isnet_quint8', debug: false }).catch(() => { });
+    }).catch(() => { });
   }, []);
 
   const handlePersonImageUpload = useCallback(async (file, autoRemoveBg = true) => {
@@ -392,38 +402,35 @@ export default function GeneratorPage() {
     if (!confirm('আপনি কি নিশ্চিতভাবে এই বিজ্ঞাপনটি মুছে ফেলতে চান?')) {
       return;
     }
+
+    // Optimistic UI update: immediately remove from local UI list and update card banner
+    setAdsList(prev => {
+      const updated = prev.filter(a => a.id !== adId);
+      setCardState(cs => {
+        if (cs.activeAdKey === adId) {
+          if (updated.length > 0) {
+            loadImage(updated[0].imageUrl).then(newImg => {
+              setCardState(s => ({
+                ...s,
+                adImg: newImg,
+                activeAdKey: updated[0].id
+              }));
+            });
+          } else {
+            return { ...cs, adImg: null, activeAdKey: null };
+          }
+        }
+        return cs;
+      });
+      return updated;
+    });
+
     try {
-      const res = await fetch(`/api/ads?id=${adId}`, {
+      await fetch(`/api/ads?id=${adId}`, {
         method: 'DELETE'
       });
-      const data = await res.json();
-      if (data.success) {
-        setAdsList(prev => {
-          const updated = prev.filter(a => a.id !== adId);
-          setCardState(cs => {
-            if (cs.activeAdKey === adId) {
-              if (updated.length > 0) {
-                loadImage(updated[0].imageUrl).then(newImg => {
-                  setCardState(s => ({
-                    ...s,
-                    adImg: newImg,
-                    activeAdKey: updated[0].id
-                  }));
-                });
-              } else {
-                return { ...cs, adImg: null, activeAdKey: null };
-              }
-            }
-            return cs;
-          });
-          return updated;
-        });
-      } else {
-        alert(data.message || 'বিজ্ঞাপনটি মোছা যায়নি');
-      }
     } catch (err) {
-      console.error('Error deleting ad:', err);
-      alert('বিজ্ঞাপনটি মুছে ফেলতে ব্যর্থ হয়েছে');
+      console.warn('Delete ad API warning:', err);
     }
   }, []);
 
