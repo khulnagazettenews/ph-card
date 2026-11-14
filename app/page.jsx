@@ -55,6 +55,10 @@ export default function GeneratorPage() {
 
   const canvasRef = useRef(null);
 
+  const [adsList, setAdsList] = useState([]);
+  const [adsLoading, setAdsLoading] = useState(true);
+  const [uploadingAd, setUploadingAd] = useState(false);
+
   const [cardState, setCardState] = useState({
     logoImg: null,
     bgImg: null,
@@ -141,7 +145,36 @@ export default function GeneratorPage() {
     });
   }, []);
 
-  // Initial assets & date loading
+  // Fetch ads from MongoDB API
+  const fetchAds = useCallback(async () => {
+    try {
+      setAdsLoading(true);
+      const res = await fetch('/api/ads');
+      const data = await res.json();
+      if (data.success && data.ads && data.ads.length > 0) {
+        setAdsList(data.ads);
+        // Load the first ad image if not set yet
+        setCardState(prev => {
+          if (!prev.adImg && data.ads[0]) {
+            loadImage(data.ads[0].imageUrl).then(img => {
+              setCardState(s => ({
+                ...s,
+                adImg: img,
+                activeAdKey: data.ads[0].id
+              }));
+            }).catch(() => {});
+          }
+          return prev;
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching ads from MongoDB:', err);
+    } finally {
+      setAdsLoading(false);
+    }
+  }, []);
+
+  // Initial assets, date & database ads loading
   useEffect(() => {
     const today = new Date();
     const formattedDate = today.toISOString().split('T')[0];
@@ -149,21 +182,21 @@ export default function GeneratorPage() {
 
     Promise.all([
       loadImage('/assets/logo.png').catch(() => null),
-      loadImage('/assets/ad_road_home.png').catch(() => null),
       loadImage('/assets/card_bg.jpg').catch(() => null),
       loadImage('/assets/bg-image.png').catch(() => null)
-    ]).then(([logo, ad1, bg, quoteBg]) => {
+    ]).then(([logo, bg, quoteBg]) => {
       setCardState(prev => ({
         ...prev,
         logoImg: logo,
-        adImg: ad1,
         bgImg: bg,
         quoteBgImg: quoteBg,
         selectedDate: formattedDate,
         dateText: bengaliDate
       }));
     }).catch(err => console.error('Asset load error:', err));
-  }, []);
+
+    fetchAds();
+  }, [fetchAds]);
 
 
   const handleNewsImageUpload = useCallback((file) => {
@@ -284,29 +317,114 @@ export default function GeneratorPage() {
     reader.readAsDataURL(file);
   }, []);
 
-  const handleAdPresetChange = useCallback((adPath, key) => {
-    loadImage(adPath).then(img => {
+  const handleSelectAd = useCallback((ad) => {
+    if (!ad?.imageUrl) return;
+    loadImage(ad.imageUrl).then(img => {
       setCardState(prev => ({
         ...prev,
         adImg: img,
-        activeAdKey: key
+        activeAdKey: ad.id
       }));
-    });
+    }).catch(err => console.error('Error loading selected ad image:', err));
   }, []);
 
-  const handleCustomAdUpload = useCallback((file) => {
+  const handleCustomAdUpload = useCallback(async (file) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      loadImage(e.target?.result).then(img => {
+    try {
+      setUploadingAd(true);
+
+      // Pre-process and optimize the image to exact banner dimensions (1000x120)
+      // This prevents body-size payload errors and ensures fast MongoDB saving
+      const dataUrl = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const rawUrl = e.target?.result;
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1000;
+            canvas.height = 120;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, 1000, 120);
+            resolve(canvas.toDataURL('image/png'));
+          };
+          img.onerror = () => resolve(rawUrl);
+          img.src = rawUrl;
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+      });
+
+      if (!dataUrl) {
+        alert('ছবিটি পড়তে ব্যর্থ হয়েছে।');
+        setUploadingAd(false);
+        return;
+      }
+
+      const title = file.name ? file.name.replace(/\.[^/.]+$/, '') : 'কাস্টম ব্যানার';
+      const res = await fetch('/api/ads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, imageUrl: dataUrl })
+      });
+      const data = await res.json();
+
+      if (data.success && data.ad) {
+        const img = await loadImage(dataUrl);
         setCardState(prev => ({
           ...prev,
           adImg: img,
-          activeAdKey: 'custom'
+          activeAdKey: data.ad.id
         }));
+        setAdsList(prev => [data.ad, ...prev]);
+      } else {
+        alert('বিজ্ঞাপনটি ডাটাবেজে সংরক্ষণ করতে সমস্যা হয়েছে: ' + (data.error || data.message || ''));
+      }
+    } catch (err) {
+      console.error('Ad upload error:', err);
+      alert('বিজ্ঞাপন আপলোড করতে ব্যর্থ হয়েছে: ' + (err.message || ''));
+    } finally {
+      setUploadingAd(false);
+    }
+  }, []);
+
+  const handleDeleteAd = useCallback(async (adId) => {
+    if (!confirm('আপনি কি নিশ্চিতভাবে এই বিজ্ঞাপনটি মুছে ফেলতে চান?')) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/ads?id=${adId}`, {
+        method: 'DELETE'
       });
-    };
-    reader.readAsDataURL(file);
+      const data = await res.json();
+      if (data.success) {
+        setAdsList(prev => {
+          const updated = prev.filter(a => a.id !== adId);
+          setCardState(cs => {
+            if (cs.activeAdKey === adId) {
+              if (updated.length > 0) {
+                loadImage(updated[0].imageUrl).then(newImg => {
+                  setCardState(s => ({
+                    ...s,
+                    adImg: newImg,
+                    activeAdKey: updated[0].id
+                  }));
+                });
+              } else {
+                return { ...cs, adImg: null, activeAdKey: null };
+              }
+            }
+            return cs;
+          });
+          return updated;
+        });
+      } else {
+        alert(data.message || 'বিজ্ঞাপনটি মোছা যায়নি');
+      }
+    } catch (err) {
+      console.error('Error deleting ad:', err);
+      alert('বিজ্ঞাপনটি মুছে ফেলতে ব্যর্থ হয়েছে');
+    }
   }, []);
 
   const handleDownload = useCallback(() => {
@@ -325,7 +443,10 @@ export default function GeneratorPage() {
 
   if (status === 'loading') {
     return (
-      <div style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'sans-serif' }}>
+      <div
+        suppressHydrationWarning
+        style={{ display: 'flex', minHeight: '100vh', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', color: '#f8fafc', fontFamily: 'sans-serif' }}
+      >
         <h2>লোড হচ্ছে...</h2>
       </div>
     );
@@ -345,8 +466,13 @@ export default function GeneratorPage() {
           onDownload={handleDownload}
           onImageUpload={handleNewsImageUpload}
           onPersonImageUpload={handlePersonImageUpload}
-          onAdPresetChange={handleAdPresetChange}
+          onAdPresetChange={handleSelectAd}
           onCustomAdUpload={handleCustomAdUpload}
+          adsList={adsList}
+          adsLoading={adsLoading}
+          uploadingAd={uploadingAd}
+          onSelectAd={handleSelectAd}
+          onDeleteAd={handleDeleteAd}
         />
         <CardCanvas
           state={cardState}

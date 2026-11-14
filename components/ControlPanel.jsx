@@ -11,7 +11,20 @@ function translateToBengaliDigits(str) {
   return str ? str.toString().split('').map(char => BENGALI_DIGITS[char] || char).join('') : '০';
 }
 
-export default function ControlPanel({ state, updateState, onDownload, onImageUpload, onPersonImageUpload, onAdPresetChange, onCustomAdUpload }) {
+export default function ControlPanel({
+  state,
+  updateState,
+  onDownload,
+  onImageUpload,
+  onPersonImageUpload,
+  onAdPresetChange,
+  onCustomAdUpload,
+  adsList = [],
+  adsLoading = false,
+  uploadingAd = false,
+  onSelectAd,
+  onDeleteAd
+}) {
   const [downloading, setDownloading] = useState(false);
 
   const handleDownloadClick = () => {
@@ -457,6 +470,59 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
         <div className="panel-section">
           <h2 className="section-title"><span className="section-num">২</span> শিরোনাম ও বিবরণ</h2>
 
+          {/* Sub Headline */}
+          <div className="form-group">
+            <label htmlFor="subHeadlineInput">উপ-শিরোনাম (Sub Headline)</label>
+            <input
+              type="text"
+              id="subHeadlineInput"
+              placeholder="এখানে উপ-শিরোনাম লিখুন (ঐচ্ছিক)"
+              value={state.subHeadline}
+              onChange={(e) => updateState({ subHeadline: e.target.value })}
+              style={{ fontFamily: `"${state.subHeadlineFont}", var(--font-bangla)` }}
+            />
+          </div>
+
+          <div className="form-group range-group">
+            <div className="range-header">
+              <span>উপ-শিরোনাম ফন্ট সাইজ (Sub Font Size)</span>
+              <span>{state.subFontSize}px</span>
+            </div>
+            <input
+              type="range"
+              min="16"
+              max="75"
+              value={state.subFontSize}
+              onChange={(e) => updateState({ subFontSize: parseInt(e.target.value) })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="subHeadlineFontFamily">উপ-শিরোনাম ফন্ট (Sub Font)</label>
+            <select
+              id="subHeadlineFontFamily"
+              className="font-select"
+              value={state.subHeadlineFont}
+              onChange={(e) => updateState({ subHeadlineFont: e.target.value })}
+            >
+              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
+              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
+              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
+              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
+              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
+              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
+              <option value="Anek Bangla">Anek Bangla</option>
+              <option value="Tiro Bangla">Tiro Bangla</option>
+              <option value="Baloo Da 2">Baloo Da 2</option>
+              <option value="Mina">Mina</option>
+              <option value="Galada">Galada</option>
+              <option value="Atma">Atma</option>
+              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
+              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
+              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
+            </select>
+          </div>
+
           {/* Main Headline */}
           <div className="form-group">
             <label htmlFor="headlineInput">মূল শিরোনাম (Headline)</label>
@@ -513,83 +579,8 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
             </select>
           </div>
 
-          {/* Sub Headline */}
-          <div className="form-group">
-            <label htmlFor="subHeadlineInput">উপ-শিরোনাম (Sub Headline)</label>
-            <input
-              type="text"
-              id="subHeadlineInput"
-              placeholder="এখানে উপ-শিরোনাম লিখুন (ঐচ্ছিক)"
-              value={state.subHeadline}
-              onChange={(e) => updateState({ subHeadline: e.target.value })}
-              style={{ fontFamily: `"${state.subHeadlineFont}", var(--font-bangla)` }}
-            />
-          </div>
-
-          <div className="form-group range-group">
-            <div className="range-header">
-              <span>উপ-শিরোনাম ফন্ট সাইজ (Sub Font Size)</span>
-              <span>{state.subFontSize}px</span>
-            </div>
-            <input
-              type="range"
-              min="16"
-              max="75"
-              value={state.subFontSize}
-              onChange={(e) => updateState({ subFontSize: parseInt(e.target.value) })}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="subHeadlineFontFamily">উপ-শিরোনাম ফন্ট (Sub Font)</label>
-            <select
-              id="subHeadlineFontFamily"
-              className="font-select"
-              value={state.subHeadlineFont}
-              onChange={(e) => updateState({ subHeadlineFont: e.target.value })}
-            >
-              <option value="Hind Siliguri">Hind Siliguri (সোশ্যাল মিডিয়া - ডিফল্ট)</option>
-              <option value="Noto Serif Bengali">Noto Serif Bengali (নিউজ হেডলাইন)</option>
-              <option value="Siyam Rupali">Siyam Rupali (মোটা/বোল্ড)</option>
-              <option value="SolaimanLipi">SolaimanLipi (প্রচলিত নিউজ)</option>
-              <option value="AdorshoLipi">AdorshoLipi (বড় হেডলাইন)</option>
-              <option value="Noto Sans Bengali">Noto Sans Bengali</option>
-              <option value="Anek Bangla">Anek Bangla</option>
-              <option value="Tiro Bangla">Tiro Bangla</option>
-              <option value="Baloo Da 2">Baloo Da 2</option>
-              <option value="Mina">Mina</option>
-              <option value="Galada">Galada</option>
-              <option value="Atma">Atma</option>
-              <option value="SutonnyMJ">SutonnyMJ (ANSI)</option>
-              <option value="SutonnyOMJ">SutonnyOMJ (সিস্টেম - ANSI)</option>
-              <option value="Kalpurush">Kalpurush (Avro Unicode)</option>
-            </select>
-          </div>
-
           {/* Colors */}
           <div className="color-pickers-group">
-            <div className="form-group color-input-wrap">
-              <label>মূল শিরোনামের রং</label>
-              <div className="color-presets">
-                {['#ffffff', '#facc15', '#fb923c', '#f87171'].map(color => (
-                  <span
-                    key={color}
-                    className={`color-dot ${state.headlineColor === color ? 'active' : ''}`}
-                    style={{ backgroundColor: color }}
-                    onClick={() => updateState({ headlineColor: color })}
-                  />
-                ))}
-                <div className="custom-color-picker">
-                  <input
-                    type="color"
-                    value={state.headlineColor}
-                    onChange={(e) => updateState({ headlineColor: e.target.value })}
-                  />
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
-                </div>
-              </div>
-            </div>
-
             <div className="form-group color-input-wrap">
               <label>উপ-শিরোনামের রং</label>
               <div className="color-presets">
@@ -606,6 +597,28 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
                     type="color"
                     value={state.subHeadlineColor}
                     onChange={(e) => updateState({ subHeadlineColor: e.target.value })}
+                  />
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-group color-input-wrap">
+              <label>মূল শিরোনামের রং</label>
+              <div className="color-presets">
+                {['#ffffff', '#facc15', '#fb923c', '#f87171'].map(color => (
+                  <span
+                    key={color}
+                    className={`color-dot ${state.headlineColor === color ? 'active' : ''}`}
+                    style={{ backgroundColor: color }}
+                    onClick={() => updateState({ headlineColor: color })}
+                  />
+                ))}
+                <div className="custom-color-picker">
+                  <input
+                    type="color"
+                    value={state.headlineColor}
+                    onChange={(e) => updateState({ headlineColor: e.target.value })}
                   />
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M7.5 10.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M11.5 7.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M16.5 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><path d="M6 14c0-2 2-3 4-3 1 0 3 1.5 3 3.5s-2 3.5-3.5 3.5S6 16 6 14z"/></svg>
                 </div>
@@ -666,48 +679,79 @@ export default function ControlPanel({ state, updateState, onDownload, onImageUp
         </div>
 
         <div className="form-group">
-          <label>বিজ্ঞাপন নির্বাচন করুন</label>
+          <label>বিজ্ঞাপন নির্বাচন করুন (ডাটাবেজ সংরক্ষিত)</label>
           <div className="ad-selector-grid">
-            <div
-              className={`ad-preset-option ${state.activeAdKey === 'ad1' ? 'active' : ''}`}
-              onClick={() => onAdPresetChange('/assets/ad_road_home.png', 'ad1')}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/ad_road_home.png" alt="Road Home Ad" />
-              <span className="preset-label">Road Home</span>
-            </div>
+            {adsLoading ? (
+              <div style={{ gridColumn: 'span 2', textAlign: 'center', padding: '16px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ margin: '0 auto 6px', display: 'block' }}>
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+                ডাটাবেজ থেকে বিজ্ঞাপন লোড হচ্ছে...
+              </div>
+            ) : (
+              <>
+                {adsList && adsList.map((ad) => (
+                  <div
+                    key={ad.id}
+                    className={`ad-preset-option ${state.activeAdKey === ad.id ? 'active' : ''}`}
+                    onClick={() => onSelectAd ? onSelectAd(ad) : onAdPresetChange(ad.imageUrl, ad.id)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={ad.imageUrl} alt={ad.title} />
+                    <span className="preset-label">{ad.title}</span>
 
-            <div
-              className={`ad-preset-option ${state.activeAdKey === 'ad2' ? 'active' : ''}`}
-              onClick={() => onAdPresetChange('/assets/ad_aci_water_pump.png', 'ad2')}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/ad_aci_water_pump.png" alt="ACI Water Pump Ad" />
-              <span className="preset-label">ACI Water Pump</span>
-            </div>
+                    {/* Delete button */}
+                    <button
+                      type="button"
+                      className="delete-ad-btn"
+                      title="বিজ্ঞাপন মুছুন"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteAd && onDeleteAd(ad.id);
+                      }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        <line x1="10" y1="11" x2="10" y2="17"/>
+                        <line x1="14" y1="11" x2="14" y2="17"/>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </>
+            )}
 
-            <div
-              className={`ad-preset-option ${state.activeAdKey === 'ad3' ? 'active' : ''}`}
-              onClick={() => onAdPresetChange('/assets/ad_aci_smart_tools.png', 'ad3')}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/ad_aci_smart_tools.png" alt="ACI Smart Tools Ad" />
-              <span className="preset-label">ACI Smart Tools</span>
-            </div>
-
-            <div className={`ad-preset-option ${state.activeAdKey === 'custom' ? 'active' : ''}`}>
+            {/* Custom Ad Upload Card */}
+            <div className={`ad-preset-option custom-ad-upload-card ${uploadingAd ? 'loading-upload' : ''}`}>
               <label htmlFor="customAdFile" style={{ cursor: 'pointer', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div className="custom-ad-placeholder">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                  <span>কাস্টম ব্যানার</span>
-                </div>
+                {uploadingAd ? (
+                  <div className="custom-ad-placeholder">
+                    <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ margin: '0 auto 4px', display: 'block' }}>
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                    </svg>
+                    <span>সংরক্ষণ হচ্ছে...</span>
+                  </div>
+                ) : (
+                  <div className="custom-ad-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span>+ কাস্টম ব্যানার</span>
+                  </div>
+                )}
               </label>
               <input
                 type="file"
                 id="customAdFile"
                 accept="image/*"
+                disabled={uploadingAd}
                 className="file-input-hidden"
-                onChange={(e) => e.target.files?.[0] && onCustomAdUpload(e.target.files[0])}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    onCustomAdUpload(file);
+                    e.target.value = '';
+                  }
+                }}
               />
             </div>
           </div>

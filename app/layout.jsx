@@ -13,6 +13,24 @@ export default function RootLayout({ children }) {
   return (
     <html lang="bn" suppressHydrationWarning>
       <head>
+        {/* Guard script to prevent Chrome extensions from injecting bis_skin_checked and breaking React hydration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var origSet = Element.prototype.setAttribute;
+                  Element.prototype.setAttribute = function(name, val) {
+                    if (typeof name === 'string' && (name.indexOf('bis_') !== -1 || name.indexOf('__processed_') === 0)) {
+                      return;
+                    }
+                    return origSet.apply(this, arguments);
+                  };
+                } catch(e) {}
+              })();
+            `
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -23,11 +41,11 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.maateen.me/siyam-rupali/font.css" rel="stylesheet" />
         <link href="https://fonts.maateen.me/adorsho-lipi/font.css" rel="stylesheet" />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <Providers>{children}</Providers>
 
         {/* Hidden font preloader to ensure browser downloads all web fonts */}
-        <div style={{ position: 'absolute', opacity: 0.01, pointerEvents: 'none', zIndex: -9999, fontSize: '1px' }}>
+        <div suppressHydrationWarning style={{ position: 'absolute', opacity: 0.01, pointerEvents: 'none', zIndex: -9999, fontSize: '1px' }}>
           <span style={{ fontFamily: 'Noto Serif Bengali', fontWeight: 700 }}>খুলনা গেজেট যুক্তবর্ণ</span>
           <span style={{ fontFamily: 'Hind Siliguri', fontWeight: 600 }}>খুলনা গেজেট যুক্তবর্ণ</span>
           <span style={{ fontFamily: 'Hind Siliguri', fontWeight: 700 }}>খুলনা গেজেট যুক্তবর্ণ</span>

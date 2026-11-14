@@ -326,7 +326,7 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
     ctx.stroke();
 
 
-    // 4. Headline & Sub-Headline Area (Headline on TOP, Sub-Headline UNDERNEATH)
+    // 4. Headline & Sub-Headline Area (Sub-Headline on TOP, Headline UNDERNEATH)
     const textX = canvas.width / 2;
     const maxWidth = 900;
     const maxAvailableHeight = 260;
@@ -358,10 +358,10 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
         subLines = [];
       }
 
-      gap = subLines.length > 0 ? Math.round(Math.min(26, Math.max(14, effectiveSubFontSize * 0.45))) : 0;
-      headBlockHeight = lines.length > 0 ? (lines.length - 1) * headlineLineHeight + (effectiveFontSize * 1.0) : 0;
+      gap = (subLines.length > 0 && lines.length > 0) ? Math.round(Math.min(26, Math.max(14, effectiveSubFontSize * 0.45))) : 0;
       subBlockHeight = subLines.length > 0 ? (subLines.length - 1) * subLineHeight + (effectiveSubFontSize * 1.0) : 0;
-      totalHeight = headBlockHeight + gap + subBlockHeight;
+      headBlockHeight = lines.length > 0 ? (lines.length - 1) * headlineLineHeight + (effectiveFontSize * 1.0) : 0;
+      totalHeight = subBlockHeight + gap + headBlockHeight;
 
       if (attempt === 0 && totalHeight > maxAvailableHeight) {
         const scaleFactor = Math.max(0.80, maxAvailableHeight / totalHeight);
@@ -384,37 +384,37 @@ export default function CardCanvas({ state, updateState, canvasRef }) {
     ctx.shadowBlur = 3;
     ctx.shadowOffsetY = 2;
 
-    // 1. Draw Main Headline (Top)
-    if (lines.length > 0) {
-      const headlineFontString = `700 ${effectiveFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
-      ctx.fillStyle = state.headlineColor;
-      ctx.textAlign = 'center';
-      ctx.font = headlineFontString;
-
-      let currentY = topY + (effectiveFontSize * 0.82);
-      for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], textX, currentY);
-        if (i < lines.length - 1) {
-          currentY += headlineLineHeight;
-        }
-      }
-    }
-
-    // 2. Draw Sub-Headline (Bottom)
+    // 1. Draw Sub-Headline (Top - 1st)
     if (subLines.length > 0) {
       const subFontString = `700 ${effectiveSubFontSize}px "${state.subHeadlineFont}"${BANGLA_FONT_FALLBACKS}`;
       ctx.fillStyle = state.subHeadlineColor;
       ctx.textAlign = 'center';
       ctx.font = subFontString;
 
-      let currentY = lines.length > 0
-        ? topY + headBlockHeight + gap + (effectiveSubFontSize * 0.82)
-        : topY + (effectiveSubFontSize * 0.82);
-
+      let currentY = topY + (effectiveSubFontSize * 0.82);
       for (let i = 0; i < subLines.length; i++) {
         ctx.fillText(subLines[i], textX, currentY);
         if (i < subLines.length - 1) {
           currentY += subLineHeight;
+        }
+      }
+    }
+
+    // 2. Draw Main Headline (Bottom - After Sub-Headline)
+    if (lines.length > 0) {
+      const headlineFontString = `700 ${effectiveFontSize}px "${state.headlineFont}"${BANGLA_FONT_FALLBACKS}`;
+      ctx.fillStyle = state.headlineColor;
+      ctx.textAlign = 'center';
+      ctx.font = headlineFontString;
+
+      let currentY = subLines.length > 0
+        ? topY + subBlockHeight + gap + (effectiveFontSize * 0.82)
+        : topY + (effectiveFontSize * 0.82);
+
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], textX, currentY);
+        if (i < lines.length - 1) {
+          currentY += headlineLineHeight;
         }
       }
     }

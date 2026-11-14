@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { getDatabase } from '@/lib/mongodb';
 
 export const authOptions = {
   providers: [
@@ -10,19 +11,43 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' }
       },
       async authorize(credentials) {
-        const adminEmail = process.env.ADMIN_EMAIL || 'admin@khulnagazette.com';
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const inputEmail = credentials.email.trim().toLowerCase();
+        const inputPassword = credentials.password;
+
+        // 1. Check in MongoDB Users Collection
+        try {
+          const db = await getDatabase();
+          const user = await db.collection('users').findOne({ email: inputEmail });
+
+          if (user && user.password === inputPassword) {
+            return {
+              id: user._id.toString(),
+              name: user.name || 'Khulna Gazette User',
+              email: user.email,
+              role: user.role || 'admin'
+            };
+          }
+        } catch (dbErr) {
+          console.warn('MongoDB query warning (falling back to env credentials):', dbErr.message);
+        }
+
+        // 2. Fallback to Environment Admin Credentials
+        const adminEmail = (process.env.ADMIN_EMAIL || 'admin@khulnagazette.com').toLowerCase();
         const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
 
-        if (
-          credentials?.email === adminEmail &&
-          credentials?.password === adminPassword
-        ) {
+        if (inputEmail === adminEmail && inputPassword === adminPassword) {
           return {
             id: '1',
             name: 'Khulna Gazette Admin',
-            email: adminEmail
+            email: adminEmail,
+            role: 'admin'
           };
         }
+
         return null;
       }
     })
