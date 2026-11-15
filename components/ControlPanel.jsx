@@ -584,7 +584,7 @@ export default function ControlPanel({
             <div className="form-group color-input-wrap">
               <label>উপ-শিরোনামের রং</label>
               <div className="color-presets">
-                {['#f8fafc', '#facc15', '#38bdf8', '#f87171'].map(color => (
+                {['#facc15', '#ffffff', '#38bdf8', '#f87171'].map(color => (
                   <span
                     key={color}
                     className={`color-dot ${state.subHeadlineColor === color ? 'active' : ''}`}

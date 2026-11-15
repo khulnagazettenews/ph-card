@@ -63,7 +63,7 @@ const state = {
   dateText: '',
   subHeadline: '',
   subFontSize: 30,
-  subHeadlineColor: '#f8fafc',
+  subHeadlineColor: '#facc15',
   headlineColor: '#ffffff',
   headline: 'RjvB MYnZ¨vi wePvi Ki‡Z miKvi cÖwZkÖæZŸ×: wiRfx',
   fontSize: 50,
